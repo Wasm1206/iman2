@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ماموریت ویژه | جنگ جهانی</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Tahoma,Arial,sans-serif;background:#071018;color:#eaf6ff;min-height:100vh}
+button,input{font:inherit}button{cursor:pointer;border:0}.app{max-width:1100px;margin:auto;min-height:100vh;background:linear-gradient(180deg,#071521,#0a1118)}
+header{padding:14px 18px;border-bottom:1px solid #1e5267;background:#081923;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+.brand{font-size:22px;font-weight:900}.brand small{display:block;color:#65d7ff;font-size:12px;margin-top:4px}.stats{display:flex;gap:8px;flex-wrap:wrap}.stat{background:#102936;border:1px solid #24576a;border-radius:10px;padding:7px 10px;font-size:12px}
+main{padding:18px}.screen{display:none}.screen.active{display:block}.card{background:linear-gradient(145deg,#0b202b,#09151d);border:1px solid #1d566b;border-radius:16px;padding:16px;box-shadow:0 10px 35px #0007;margin-bottom:14px}
+.auth{max-width:460px;margin:7vh auto}.hero{min-height:230px;border-radius:18px;padding:30px 20px;display:flex;flex-direction:column;justify-content:center;background:linear-gradient(#0006,#0009),url("https://images.unsplash.com/photo-1595590424283-b8f17842773f?auto=format&fit=crop&w=1200&q=80") center/cover;border:1px solid #3c7484}
+h1{font-size:42px;margin:0;text-shadow:0 3px 12px #000}.hero h2{margin:4px 0 25px;color:#ccefff}.field{margin:10px 0}.field label{display:block;font-size:13px;color:#a9cad5;margin-bottom:6px}input{width:100%;padding:12px;border-radius:10px;border:1px solid #2c6171;background:#07131a;color:#fff;outline:none}input:focus{border-color:#46d0ff}
+.btn{padding:11px 15px;border-radius:10px;background:#087cc1;color:#fff;font-weight:700;border:1px solid #35b9ee}.btn.green{background:#0a9d54}.btn.red{background:#8f2430}.btn.dark{background:#162932}.btn:disabled{opacity:.4;cursor:not-allowed}.row{display:flex;gap:8px;flex-wrap:wrap}.nav{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:14px}.nav button{padding:11px 5px;background:#102a35;color:#bfe6f2;border:1px solid #24576a;border-radius:10px}.nav button.on{background:#0872a8;color:white}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.mission{min-height:145px;background:#0c2028;border:1px solid #24576a;border-radius:13px;padding:12px}.mission.done{opacity:.55;border-color:#0a9d54}.mission h3{margin:4px 0}.muted{color:#8eb0bb;font-size:12px}.power{color:#ffd65a}.coin{color:#ffd34e}.online{color:#36e67c}.offline{color:#aaa}.friend{display:flex;align-items:center;justify-content:space-between;padding:10px;background:#0c2028;border:1px solid #204a5a;border-radius:11px;margin:7px 0}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#193d4a}.status{font-size:11px}.troop{padding:10px;background:#0b2029;border:1px solid #24576a;border-radius:11px}.troop b{display:block}.qty{display:flex;justify-content:space-between;align-items:center;margin-top:8px}.qty button{width:30px;height:30px;border-radius:8px;background:#173d4b;color:white}
+.battle{background:linear-gradient(#0004,#0008),url("https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=80") center/cover;border-radius:15px;padding:16px;min-height:270px}.timer{font-size:48px;text-align:center;color:#ffe05b;font-weight:900}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#071a23;border:1px solid #2d7184;padding:10px 16px;border-radius:10px;display:none;z-index:20;max-width:90%;text-align:center}.small{font-size:11px}.list{max-height:420px;overflow:auto}.bar{height:10px;background:#122b35;border-radius:20px;overflow:hidden}.bar i{display:block;height:100%;background:#25aee8;transition:width .4s}.notice{padding:10px;border-radius:10px;background:#112b34;color:#bce9f5;margin:8px 0}
+.finished-name{text-decoration:line-through;color:#ffe05b;font-weight:700}.finished-tag{color:#ffe05b;font-weight:900;margin-right:6px}
+.finishedHero{min-height:260px;border-radius:18px;padding:30px 20px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:linear-gradient(#0007,#000a),url("https://images.unsplash.com/photo-1592840062661-a5a7f78e2056?auto=format&fit=crop&w=1200&q=80") center/cover;border:1px solid #3c7484}
+.finishedHero h1{color:#ffe05b}
+@media(max-width:600px){main{padding:10px}.hero{min-height:200px}h1{font-size:31px}.nav{grid-template-columns:repeat(5,1fr)}.nav button{font-size:11px;padding:9px 2px}.stats{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand">ماموریت ویژه <small>جنگ جهانی</small></div>
+  <div class="stats" id="topStats"></div>
+</header>
+<main>
+<section id="authScreen" class="screen active">
+  <div class="auth">
+    <div class="hero"><h1>ماموریت ویژه</h1><h2>جنگ جهانی</h2><div class="row"><button class="btn green" onclick="showAuth('signup')">افزودن حساب</button><button class="btn" onclick="showAuth('login')">ورود به حساب</button></div></div>
+    <div id="authForm" class="card" style="display:none">
+      <h3 id="authTitle"></h3>
+      <div class="field"><label>نام کاربری</label><input id="username" maxlength="18" autocomplete="username"></div>
+      <div class="field"><label>رمز عبور</label><input id="password" type="password" minlength="6" autocomplete="current-password"></div>
+      <div id="confirmWrap" class="field"><label>تکرار رمز</label><input id="confirm" type="password"></div>
+      <div class="row"><button class="btn green" id="authBtn"></button><button class="btn dark" onclick="showAuth('')">بستن</button></div>
+      <p class="muted">حساب واقعی با Firebase ساخته می‌شود؛ اطلاعات بازی شما آنلاین ذخیره می‌شود.</p>
+    </div>
+  </div>
+</section>
+
+<section id="gameScreen" class="screen">
+  <div class="nav">
+    <button class="on" onclick="tab('home',this)">🏠 پایگاه</button>
+    <button onclick="tab('friends',this)">👥 دوستان</button>
+    <button onclick="tab('attack',this)">⚔️ حمله</button>
+    <button onclick="tab('barracks',this)">🪖 پادگان</button>
+    <button onclick="logout()">🚪 خروج</button>
+  </div>
+
+  <div id="home" class="tab">
+    <div class="card"><h2>فرمانده، خوش آمدی</h2><p>نام: <b id="meName"></b></p><div class="bar"><i id="powerBar" style="width:0%"></i></div><p class="muted">پیشرفت مراحل: <span id="missionProgress">0 از 20</span> | قدرت قلمرو: <span id="myPower"></span></p></div>
+    <div class="grid">
+      <div class="card"><h3>🪙 استخراج سکه</h3><p>هر 24 ساعت: <b class="coin">100 سکه</b></p><button class="btn green" onclick="collectCoins()">دریافت سکه</button></div>
+      <div class="card"><h3>🏗️ پایگاه</h3><p>سطح ساختمان: <b id="baseLevel">1</b></p><button class="btn" onclick="upgradeBase()">ارتقا</button></div>
+      <div class="card"><h3>📜 مأموریت روز</h3><p>یک عملیات برای افزایش قدرت انجام بده.</p><button class="btn" onclick="tab('attack',document.querySelectorAll('.nav button')[2])">رفتن به حمله</button></div>
+    </div>
+  </div>
+
+  <div id="friends" class="tab" style="display:none">
+    <div class="card"><h2>👥 دوستان</h2><div class="row"><input id="friendSearch" placeholder="نام دوستت را جستجو کن..." oninput="renderUsers()"></div><p class="muted">کاربران واقعی ثبت‌نام‌شده در بازی اینجا نشان داده می‌شوند.</p><div id="users" class="list"></div></div>
+    <div class="card"><h3>درخواست‌های دوستی</h3><div id="requests"></div></div>
+    <div class="card"><h3>لیست دوستان من</h3><div id="friendList"></div></div>
+  </div>
+
+  <div id="attack" class="tab" style="display:none">
+    <div class="card"><h2>⚔️ عملیات جنگ جهانی</h2><div class="row"><button class="btn on" onclick="attackMode('solo',this)">حمله</button><button class="btn dark" onclick="attackMode('coop',this)">حمله با دوست</button></div></div>
+    <div id="soloBox"><div class="grid" id="missions"></div></div>
+    <div id="coopBox" style="display:none">
+      <div class="card"><h3>درخواست‌های دریافتی</h3><div id="incomingInvites"></div></div>
+      <div class="card"><h3>دعوت دوست به حمله مشترک</h3><p class="muted">فقط دوستان آنلاین قابل دعوت هستند.</p><div id="inviteList"></div></div>
+    </div>
+  </div>
+
+  <div id="barracks" class="tab" style="display:none">
+    <div class="card"><h2>🪖 پادگان</h2><p class="muted">60 نیروی مختلف از قدرت پایین تا بالا</p><div class="grid" id="troops"></div></div>
+  </div>
+</section>
+
+<section id="battleScreen" class="screen">
+  <div class="card"><h2 id="battleTitle"></h2><div class="battle"><div class="timer" id="timer">05</div><div id="battleInfo" style="text-align:center"></div></div><div class="row" style="margin-top:10px"><button class="btn dark" onclick="backGame()">بازگشت</button></div></div>
+</section>
+
+<section id="finishedScreen" class="screen">
+  <div class="card">
+    <div class="finishedHero">
+      <h1>🏆 مراحل تمام شد</h1>
+      <p>فرمانده، تو تمام ۲۰ مأموریت را با موفقیت به پایان رساندی و دیگر امکان بازی کردن وجود ندارد.</p>
+      <p class="muted" id="finishedStats"></p>
+    </div>
+    <div class="row" style="margin-top:14px;justify-content:center">
+      <button class="btn dark" onclick="logout()">🚪 خروج از حساب</button>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+import {getDatabase,ref,set,get,update,onValue,push,remove,onDisconnect,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyDzQbkJAg3Lma1MLnSxKJIYec6_m8yP3DY",
+ authDomain:"gameo-42f15.firebaseapp.com",
+ projectId:"gameo-42f15",
+ storageBucket:"gameo-42f15.firebasestorage.app",
+ messagingSenderId:"1039078348061",
+ appId:"1:1039078348061:web:6885f907039254eb453df4",
+ measurementId:"G-Y1RQ7QX2EE"
+};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getDatabase(app);
+
+let me=null, mode="login", unsubscribe=null, inviteUnsub=null, battleUnsub=null;
+let currentMissionIndex=null, currentBattleId=null, coopRole=null, countdownTimer=null, battleDoneLocal=false;
+let allUsersCache=[]; const sentThisSession=new Set();
+let friendListeners={}; let friendsData={}; let incomingInvites={};
+
+const troopNames=["پیاده‌نظام","تفنگدار","تک‌تیرانداز","پزشک","مهندس","نارنجک‌انداز","مسلسل‌چی","ضدتانک","تانک سبک","تانک متوسط","تانک سنگین","توپخانه","خمپاره‌انداز","راکت‌انداز","ضدهوایی","هواپیمای شناسایی","جنگنده","بمب‌افکن","هلیکوپتر","هلیکوپتر تهاجمی","پهپاد","نیروی ویژه","کماندو","تکاور","زرهی سریع","زرهی سنگین","موشک‌انداز","سامانه دفاعی","تانک شکارچی","تانک مدرن","پیاده‌نظام نخبه","تک‌تیرانداز نخبه","کماندو نخبه","پزشک رزمی","مهندس رزمی","ضدزره نخبه","توپخانه سنگین","توپخانه خودکششی","راکت سنگین","موشک کوتاه‌برد","موشک میان‌برد","موشک دوربرد","ضدهوایی پیشرفته","سامانه دفاع هوایی","جنگنده چندمنظوره","جنگنده سنگین","بمب‌افکن استراتژیک","هلیکوپتر سنگین","پهپاد تهاجمی","نیروی ویژه فوق‌نخبه","تانک فوق‌سنگین","توپخانه فوق‌سنگین","راکت‌انداز چندگانه","موشک بالستیک","سامانه دفاعی پیشرفته","هواپیمای فرماندهی","نیروی زرهی نخبه","ناو جنگی","زیردریایی","ابرنیرو"];
+const troops=troopNames.map((name,i)=>({name,power:20+i*45,cost:50+i*35}));
+
+const missions=[
+{icon:"🏚️",title:"خانه متروکه",desc:"خانه‌ای که داخلش گنج هست و چند نگهبان و محافظ دارد.",power:200},
+{icon:"🌲",title:"پایگاه جنگلی",desc:"یک پایگاه مخفی در میان جنگل که نیروهای دشمن از آن دفاع می‌کنند.",power:250},
+{icon:"🏭",title:"کارخانه متروکه",desc:"کارخانه‌ای قدیمی که انبار مهمات و تجهیزات در آن باقی مانده است.",power:300},
+{icon:"🏔️",title:"کوهستان",desc:"یک موضع مستحکم در ارتفاعات که مسیرهایش به‌شدت محافظت می‌شوند.",power:350},
+{icon:"🚢",title:"بندر نظامی",desc:"انبارهای بندر در اختیار یک نیروی مسلح ناشناس قرار گرفته است.",power:400},
+{icon:"🏰",title:"قلعه مرزی",desc:"قلعه‌ای قدیمی با دیوارهای سنگین و دیده‌بان‌های متعدد.",power:450},
+{icon:"✈️",title:"فرودگاه متروکه",desc:"فرودگاهی دورافتاده که دوباره به مرکز عملیات تبدیل شده است.",power:500},
+{icon:"🛰️",title:"مرکز ارتباطات",desc:"مرکز ارتباطی دشمن باید پیش از ارسال اطلاعات جدید تصرف شود.",power:600},
+{icon:"🏙️",title:"شهر ویران",desc:"شهر مخروبه‌ای که به مقر موقت دشمن تبدیل شده است.",power:700},
+{icon:"🌉",title:"پل استراتژیک",desc:"پلی حیاتی برای عبور تجهیزات که باید تصرف شود.",power:800},
+{icon:"🏜️",title:"پایگاه صحرایی",desc:"پایگاهی در دل بیابان با تجهیزات سنگین دشمن.",power:900},
+{icon:"🚇",title:"تونل زیرزمینی",desc:"شبکه‌ای از تونل‌ها که دشمن از آن برای عبور استفاده می‌کند.",power:1000},
+{icon:"🏗️",title:"کارگاه اسلحه‌سازی",desc:"کارگاهی که سلاح‌های سنگین دشمن در آن ساخته می‌شود.",power:1150},
+{icon:"🛢️",title:"پایگاه نفتی",desc:"منبع سوخت اصلی نیروهای دشمن که باید نابود شود.",power:1300},
+{icon:"🚀",title:"سایت پرتاب موشک",desc:"سایتی که برای پرتاب موشک‌های بلندبرد آماده می‌شود.",power:1450},
+{icon:"🏯",title:"دژ کوهستانی",desc:"دژی محکم در دل کوه با چند لایه دفاعی.",power:1600},
+{icon:"🧊",title:"پایگاه قطبی",desc:"پایگاهی مخفی در مناطق یخ‌زده با تجهیزات پیشرفته.",power:1800},
+{icon:"🌋",title:"پایگاه آتشفشانی",desc:"پایگاهی خطرناک نزدیک آتشفشان با نگهبانان ویژه.",power:2000},
+{icon:"🛡️",title:"ستاد فرماندهی",desc:"مرکز فرماندهی اصلی دشمن با شدیدترین دفاع.",power:2300},
+{icon:"☢️",title:"مرکز نهایی دشمن",desc:"آخرین و قدرتمندترین پایگاه دشمن. عملیات پایانی!",power:2600}
+];
+
+function $(id){return document.getElementById(id)}
+function toast(t){$("toast").textContent=t;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",2400)}
+function emailFor(n){return n.toLowerCase().replace(/[^a-z0-9]/g,"")+"_player@gameo.local"}
+
+window.showAuth=function(m){mode=m;if(!m){$("authForm").style.display="none";return}$("authForm").style.display="block";$("authTitle").textContent=m==="signup"?"ساخت حساب":"ورود به حساب";$("authBtn").textContent=m==="signup"?"ساخت حساب":"ورود";$("confirmWrap").style.display=m==="signup"?"block":"none";$("authBtn").onclick=authAction}
+
+async function authAction(){
+ const n=$("username").value.trim(),p=$("password").value,c=$("confirm").value;
+ if(n.length<2||p.length<6)return toast("نام حداقل ۲ حرف و رمز حداقل ۶ کاراکتر باشد.");
+ if(mode==="signup"&&p!==c)return toast("رمزها یکسان نیستند.");
+ try{
+  if(mode==="signup"){
+   const cred=await createUserWithEmailAndPassword(auth,emailFor(n),p);
+   await set(ref(db,"users/"+cred.user.uid),{name:n,online:true,power:200,coins:500,baseLevel:1,createdAt:Date.now(),friends:{},requests:{},completedMissions:{},finished:false});
+  }else await signInWithEmailAndPassword(auth,emailFor(n),p);
+ }catch(e){toast(firebaseError(e.code))}
+}
+function firebaseError(c){return c==="auth/email-already-in-use"?"این نام قبلاً گرفته شده است.":c==="auth/invalid-credential"?"نام کاربری یا رمز اشتباه است.":c==="auth/weak-password"?"رمز خیلی ضعیف است.":"خطا: "+c}
+
+onAuthStateChanged(auth,async u=>{
+ detachAll();
+ if(!u){me=null;$("authScreen").classList.add("active");$("gameScreen").classList.remove("active");$("battleScreen").classList.remove("active");$("finishedScreen").classList.remove("active");return}
+ const s=await get(ref(db,"users/"+u.uid));
+ me=s.val()||{name:"بازیکن",power:200,coins:500,baseLevel:1,friends:{},requests:{},completedMissions:{},finished:false};
+ await update(ref(db,"users/"+u.uid),{online:true,lastSeen:serverTimestamp()});
+ setupPresence(u.uid);
+ $("authScreen").classList.remove("active");
+ renderMissions();renderTroops();
+ attachInviteListener();
+ listenMe();
+});
+
+function setupPresence(uid){
+ const connectedRef=ref(db,".info/connected");
+ onValue(connectedRef,snap=>{
+  if(snap.val()===true && auth.currentUser){
+   const myRef=ref(db,"users/"+uid);
+   onDisconnect(myRef).update({online:false,lastSeen:serverTimestamp()}).then(()=>{
+    update(myRef,{online:true,lastSeen:serverTimestamp()});
+   });
+  }
+ });
+}
+
+function listenMe(){
+ unsubscribe=onValue(ref(db,"users/"+auth.currentUser.uid),s=>{
+  me=s.val()||me;
+  const done=Object.keys(me.completedMissions||{}).length;
+  $("meName").textContent=me.name;
+  $("myPower").textContent=me.power||0;
+  $("baseLevel").textContent=me.baseLevel||1;
+  $("missionProgress").textContent=done+" از "+missions.length;
+  $("powerBar").style.width=Math.round(done/missions.length*100)+"%";
+  $("topStats").innerHTML=`<span class="stat">👤 ${me.name}</span><span class="stat">⚔️ ${me.power||0}</span><span class="stat">🪙 ${me.coins||0}</span><span class="stat">📜 ${done}/${missions.length}</span>`;
+  renderRequests();
+  renderMissions();
+  syncFriendListeners();
+  checkFinishedLock();
+ });
+}
+
+function detachAll(){
+ if(unsubscribe){unsubscribe();unsubscribe=null}
+ if(inviteUnsub){inviteUnsub();inviteUnsub=null}
+ cleanupBattle();
+ Object.values(friendListeners).forEach(u=>u());
+ friendListeners={};friendsData={};
+}
+
+function checkFinishedLock(){
+ if(me && me.finished){
+  $("gameScreen").classList.remove("active");
+  $("battleScreen").classList.remove("active");
+  $("finishedScreen").classList.add("active");
+  const done=Object.keys(me.completedMissions||{}).length;
+  $("finishedStats").textContent=`قدرت نهایی: ${me.power||0} | سکه: ${me.coins||0} | مراحل تکمیل‌شده: ${done} از ${missions.length}`;
+ }else if(me){
+  $("finishedScreen").classList.remove("active");
+  $("gameScreen").classList.add("active");
+ }
+}
+
+window.logout=async()=>{
+ if(auth.currentUser)await update(ref(db,"users/"+auth.currentUser.uid),{online:false,lastSeen:serverTimestamp()});
+ detachAll();
+ await signOut(auth);
+}
+
+window.tab=function(id,el){
+ if(me&&me.finished)return;
+ document.querySelectorAll(".tab").forEach(x=>x.style.display="none");
+ $(id).style.display="block";
+ document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("on"));
+ if(el)el.classList.add("on");
+ if(id==="friends"){loadAllUsers().then(renderUsers);renderRequests()}
+ if(id==="attack"){renderInvites()}
+}
+window.attackMode=function(m,b){
+ $("soloBox").style.display=m==="solo"?"block":"none";
+ $("coopBox").style.display=m==="coop"?"block":"none";
+ document.querySelectorAll("#attack .btn").forEach(x=>x.classList.remove("on"));
+ b.classList.add("on");
+ if(m==="coop")renderInvites();
+}
+
+/* ---------- Missions / battle ---------- */
+function myNextMissionIndex(){
+ for(let i=0;i<missions.length;i++){if(!(me.completedMissions&&me.completedMissions[i]))return i}
+ return -1;
+}
+function renderMissions(){
+ if(!me)return;
+ $("missions").innerHTML=missions.map((m,i)=>{
+  const done=!!(me.completedMissions&&me.completedMissions[i]);
+  return `<div class="mission ${done?'done':''}"><div style="font-size:28px">${m.icon}</div><h3>${m.title} ${done?'✅':''}</h3><p class="muted">${m.desc}</p><p>قدرت مورد نیاز: <b class="power">${m.power}</b></p><button class="btn ${done?'dark':'green'}" ${done?'disabled':''} onclick="prepareAttack(${i})">${done?'انجام شد':'حمله'}</button></div>`;
+ }).join("");
+}
+window.prepareAttack=function(i){
+ if(me.finished)return toast("مراحل تمام شده؛ دیگر نمی‌توانی بازی کنی.");
+ if(me.completedMissions&&me.completedMissions[i])return toast("این مرحله را قبلاً تکمیل کردی.");
+ currentMissionIndex=i;coopRole=null;battleDoneLocal=false;
+ const m=missions[i];
+ showBattle(m.icon+" "+m.title,`قدرت مکان: <b>${m.power}</b><br>نیروهای پادگان تو وارد عملیات می‌شوند.`,false,()=>finishSoloBattle());
+}
+function finishSoloBattle(){
+ if(currentMissionIndex==null)return backGame();
+ applyMissionComplete(currentMissionIndex).then(r=>{
+  if(!r.already)toast(`عملیات با موفقیت انجام شد! +${r.powerGain} قدرت، +${r.gain} سکه`);
+  currentMissionIndex=null;
+  backGame();
+ });
+}
+async function applyMissionComplete(idx){
+ if(me.completedMissions&&me.completedMissions[idx])return{already:true,count:Object.keys(me.completedMissions).length};
+ const m=missions[idx];
+ const gain=m.power*2, powerGain=Math.floor(gain/4);
+ const newCompleted={...(me.completedMissions||{}),[idx]:true};
+ const count=Object.keys(newCompleted).length;
+ const updates={power:(me.power||0)+powerGain,coins:(me.coins||0)+gain,["completedMissions/"+idx]:true};
+ if(count>=missions.length){updates.finished=true;updates.finishedAt=Date.now();}
+ await update(ref(db,"users/"+auth.currentUser.uid),updates);
+ return{already:false,gain,powerGain,count};
+}
+
+/* Countdown UI, shared by solo & coop */
+function showBattle(title,info,waiting,onDone){
+ $("gameScreen").classList.remove("active");
+ $("battleScreen").classList.add("active");
+ $("battleTitle").textContent=title;
+ $("battleInfo").innerHTML=info;
+ if(countdownTimer)clearInterval(countdownTimer);
+ if(waiting){$("timer").textContent="⏳";return}
+ let n=5;$("timer").textContent="05";
+ countdownTimer=setInterval(()=>{
+  n--;$("timer").textContent=String(Math.max(n,0)).padStart(2,"0");
+  if(n<=0){clearInterval(countdownTimer);countdownTimer=null;$("timer").textContent="⚔️";setTimeout(()=>{if(onDone)onDone()},600)}
+ },1000);
+}
+window.backGame=function(){
+ if(countdownTimer){clearInterval(countdownTimer);countdownTimer=null}
+ $("battleScreen").classList.remove("active");
+ if(!(me&&me.finished))$("gameScreen").classList.add("active");
+}
+
+window.collectCoins=async function(){
+ if(me.finished)return toast("مراحل تمام شده؛ دیگر نمی‌توانی بازی کنی.");
+ const now=Date.now(),last=me.lastCoin||0;
+ if(now-last<86400000)return toast("هنوز ۲۴ ساعت کامل نشده.");
+ await update(ref(db,"users/"+auth.currentUser.uid),{coins:(me.coins||0)+100,lastCoin:now});
+ toast("۱۰۰ سکه دریافت شد 🪙");
+}
+window.upgradeBase=async function(){
+ if(me.finished)return toast("مراحل تمام شده؛ دیگر نمی‌توانی بازی کنی.");
+ const cost=(me.baseLevel||1)*700;
+ if((me.coins||0)<cost)return toast("سکه کافی نیست.");
+ await update(ref(db,"users/"+auth.currentUser.uid),{coins:me.coins-cost,baseLevel:(me.baseLevel||1)+1,power:(me.power||0)+150});
+ toast("پایگاه ارتقا یافت.");
+}
+function renderTroops(){
+ $("troops").innerHTML=troops.map((t,i)=>`<div class="troop"><b>${i+1}. ${t.name}</b><span class="muted">قدرت: ${t.power} | هزینه: ${t.cost}</span><div class="qty"><button onclick="toast('این نسخه نمونه است')">−</button><span>0</span><button onclick="toast('نیرو انتخاب شد')">+</button></div></div>`).join("");
+}
+
+/* ---------- Real friends: search / requests / list ---------- */
+async function loadAllUsers(){
+ try{
+  const snap=await get(ref(db,"users"));
+  const val=snap.val()||{};
+  allUsersCache=Object.keys(val).filter(uid=>uid!==auth.currentUser.uid).map(uid=>({uid,...val[uid]}));
+ }catch(e){allUsersCache=[]}
+}
+function renderUsers(){
+ const q=($("friendSearch").value||"").trim().toLowerCase();
+ const friends=me.friends||{};
+ let list=allUsersCache.filter(u=>!friends[u.uid]);
+ if(q)list=list.filter(u=>(u.name||"").toLowerCase().includes(q));
+ list=list.sort((a,b)=>(b.online?1:0)-(a.online?1:0)).slice(0,40);
+ $("users").innerHTML=list.map(u=>{
+  const already=sentThisSession.has(u.uid);
+  return `<div class="friend"><div class="row" style="align-items:center"><div class="avatar">👤</div><div><b class="${u.finished?'finished-name':''}">${u.name}${u.finished?'<span class="finished-tag">بازی را تمام کرد</span>':''}</b><div class="status ${u.online?'online':'offline'}">${u.online?'🟢 Online':'⚫ offline'}</div></div></div><button class="btn ${already?'dark':''}" ${already?'disabled':''} onclick="sendRequestTo('${u.uid}')">${already?'ارسال شد':'افزودن'}</button></div>`;
+ }).join("")||'<p class="muted">کاربری پیدا نشد. جستجو کن یا منتظر بازیکن‌های دیگر بمان.</p>';
+}
+window.sendRequestTo=async function(uid){
+ if(me.finished)return toast("مراحل تمام شده؛ دیگر نمی‌توانی بازی کنی.");
+ sentThisSession.add(uid);renderUsers();
+ try{
+  await set(ref(db,"users/"+uid+"/requests/"+auth.currentUser.uid),{name:me.name,createdAt:Date.now()});
+  toast("درخواست دوستی ارسال شد.");
+ }catch(e){toast("خطا در ارسال درخواست. قوانین دیتابیس فایربیس را بررسی کن.")}
+}
+function renderRequests(){
+ const r=me.requests||{};const ids=Object.keys(r);
+ $("requests").innerHTML=ids.length?ids.map(id=>`<div class="friend"><span>👤 ${r[id].name}</span><div class="row"><button class="btn green" onclick="acceptFriend('${id}')">قبول</button><button class="btn red" onclick="declineFriend('${id}')">رد</button></div></div>`).join(""):"<p class='muted'>درخواستی نداری.</p>";
+}
+window.acceptFriend=async function(fromUid){
+ const r=me.requests&&me.requests[fromUid];if(!r)return;
+ try{
+  await update(ref(db,"users/"+auth.currentUser.uid+"/friends"),{[fromUid]:true});
+  await remove(ref(db,"users/"+auth.currentUser.uid+"/requests/"+fromUid));
+  await update(ref(db,"users/"+fromUid+"/friends"),{[auth.currentUser.uid]:true}).catch(()=>{});
+  toast("دوست اضافه شد.");
+ }catch(e){toast("خطا در پذیرش درخواست.")}
+}
+window.declineFriend=async function(fromUid){
+ await remove(ref(db,"users/"+auth.currentUser.uid+"/requests/"+fromUid));
+}
+window.deleteFriend=async function(id){
+ await remove(ref(db,"users/"+auth.currentUser.uid+"/friends/"+id));
+ await remove(ref(db,"users/"+id+"/friends/"+auth.currentUser.uid)).catch(()=>{});
+ toast("دوست حذف شد.");
+}
+function syncFriendListeners(){
+ const ids=Object.keys(me.friends||{});
+ Object.keys(friendListeners).forEach(uid=>{
+  if(!ids.includes(uid)){friendListeners[uid]();delete friendListeners[uid];delete friendsData[uid];}
+ });
+ ids.forEach(uid=>{
+  if(!friendListeners[uid]){
+   friendListeners[uid]=onValue(ref(db,"users/"+uid),s=>{
+    friendsData[uid]=s.val()||{};
+    renderFriends();renderInvites();
+   });
+  }
+ });
+ renderFriends();
+}
+function renderFriends(){
+ const ids=Object.keys(me.friends||{});
+ $("friendList").innerHTML=ids.length?ids.map(id=>{
+  const f=friendsData[id]||{name:"...",online:false};
+  const nameHtml=f.finished?`<b class="finished-name">${f.name}</b><span class="finished-tag">بازی را تمام کرد</span>`:`<b>${f.name}</b>`;
+  return `<div class="friend"><span>👤 ${nameHtml}<small class="${f.online?'online':'offline'}"> ${f.online?'🟢 Online':'⚫ offline'}</small></span><button class="btn red" onclick="deleteFriend('${id}')">حذف</button></div>`;
+ }).join(""):"<p class='muted'>هنوز دوستی اضافه نشده.</p>";
+}
+
+/* ---------- Co-op online battles ---------- */
+function attachInviteListener(){
+ if(inviteUnsub)return;
+ inviteUnsub=onValue(ref(db,"users/"+auth.currentUser.uid+"/battleInvites"),s=>{
+  incomingInvites=s.val()||{};
+  renderInvites();
+ });
+}
+function renderInvites(){
+ if(!me)return;
+ const incIds=Object.keys(incomingInvites||{});
+ $("incomingInvites").innerHTML=incIds.length?incIds.map(id=>{
+  const inv=incomingInvites[id];
+  return `<div class="friend"><span>👤 ${inv.fromName} تو را برای <b>${inv.missionTitle}</b> دعوت کرده</span><div class="row"><button class="btn green" onclick="acceptInvite('${id}')">قبول</button><button class="btn red" onclick="declineInvite('${id}')">رد</button></div></div>`;
+ }).join(""):"<p class='muted'>دعوتی نداری.</p>";
+
+ const ids=Object.keys(me.friends||{});
+ const busy=!!currentBattleId;
+ $("inviteList").innerHTML=ids.length?ids.map(id=>{
+  const f=friendsData[id]||{};
+  let btn;
+  if(f.finished)btn=`<span class="finished-tag">تمام کرده</span>`;
+  else if(!f.online)btn=`<button class="btn dark" disabled>آفلاین</button>`;
+  else if(busy)btn=`<button class="btn dark" disabled>در حال عملیات</button>`;
+  else btn=`<button class="btn green" onclick="inviteFriend('${id}')">دعوت</button>`;
+  return `<div class="friend"><span>👤 ${f.name||'...'}<small class="${f.online?'online':'offline'}"> ${f.online?'🟢 Online':'⚫ offline'}</small></span>${btn}</div>`;
+ }).join(""):"<p class='muted'>اول یک دوست اضافه کن.</p>";
+}
+window.inviteFriend=async function(friendUid){
+ if(me.finished)return toast("مراحل تمام شده؛ دیگر نمی‌توانی بازی کنی.");
+ if(currentBattleId)return toast("در حال حاضر در یک عملیات هستی.");
+ const idx=myNextMissionIndex();
+ if(idx===-1)return toast("همه مراحل تمام شده!");
+ const f=friendsData[friendUid]||{};
+ const battleRef=push(ref(db,"battles"));
+ currentBattleId=battleRef.key;coopRole="inviter";battleDoneLocal=false;
+ await set(battleRef,{p1:auth.currentUser.uid,p1Name:me.name,p2:friendUid,p2Name:f.name||"دوست",missionIndex:idx,missionTitle:missions[idx].icon+" "+missions[idx].title,status:"pending",createdAt:Date.now()});
+ await set(ref(db,"users/"+friendUid+"/battleInvites/"+battleRef.key),{battleId:battleRef.key,from:auth.currentUser.uid,fromName:me.name,missionTitle:missions[idx].icon+" "+missions[idx].title,createdAt:Date.now()});
+ watchBattle(battleRef.key);
+ toast("دعوت ارسال شد، در انتظار پاسخ دوست...");
+}
+window.acceptInvite=async function(battleId){
+ if(me.finished)return toast("مراحل تمام شده؛ دیگر نمی‌توانی بازی کنی.");
+ if(currentBattleId)return toast("در حال حاضر در یک عملیات هستی.");
+ coopRole="invitee";currentBattleId=battleId;battleDoneLocal=false;
+ await remove(ref(db,"users/"+auth.currentUser.uid+"/battleInvites/"+battleId));
+ await update(ref(db,"battles/"+battleId),{status:"active",startedAt:Date.now()});
+ watchBattle(battleId);
+}
+window.declineInvite=async function(battleId){
+ await remove(ref(db,"users/"+auth.currentUser.uid+"/battleInvites/"+battleId));
+ await update(ref(db,"battles/"+battleId),{status:"declined"}).catch(()=>{});
+}
+function watchBattle(id){
+ if(battleUnsub)battleUnsub();
+ battleUnsub=onValue(ref(db,"battles/"+id),async s=>{
+  const b=s.val();
+  if(!b)return;
+  if(b.status==="pending"&&coopRole==="inviter"){
+   showBattle("در انتظار پذیرش",`منتظر پاسخ <b>${b.p2Name}</b> برای عملیات <b>${b.missionTitle}</b> بمان...`,true,null);
+  }else if(b.status==="declined"){
+   toast("دوست دعوت را رد کرد.");
+   cleanupBattle();backGame();
+  }else if(b.status==="active"){
+   const elapsed=Math.floor((Date.now()-(b.startedAt||Date.now()))/1000);
+   const remain=Math.max(0,5-elapsed);
+   startSyncedCountdown(remain,b.missionTitle,id);
+  }else if(b.status==="done"){
+   const already=b.processed&&b.processed[auth.currentUser.uid];
+   if(!already){
+    const r=await applyMissionComplete(b.missionIndex);
+    await update(ref(db,"battles/"+id),{["processed/"+auth.currentUser.uid]:true});
+    toast(r.already?"این مرحله قبلاً تکمیل شده بود.":`عملیات مشترک موفق بود! +${r.powerGain||0} قدرت، +${r.gain||0} سکه`);
+   }
+   setTimeout(()=>{cleanupBattle();backGame();},1200);
+  }
+ });
+}
+function startSyncedCountdown(remain,title,battleId){
+ $("gameScreen").classList.remove("active");
+ $("battleScreen").classList.add("active");
+ $("battleTitle").textContent="🤝 حمله مشترک: "+title;
+ $("battleInfo").innerHTML="عملیات مشترک در حال اجراست...";
+ if(countdownTimer)clearInterval(countdownTimer);
+ let n=remain;
+ $("timer").textContent=String(n).padStart(2,"0");
+ if(n<=0){finishCoopIfNeeded(battleId);return}
+ countdownTimer=setInterval(()=>{
+  n--;$("timer").textContent=String(Math.max(n,0)).padStart(2,"0");
+  if(n<=0){
+   clearInterval(countdownTimer);countdownTimer=null;
+   $("timer").textContent="⚔️";
+   setTimeout(()=>finishCoopIfNeeded(battleId),600);
+  }
+ },1000);
+}
+async function finishCoopIfNeeded(battleId){
+ if(battleDoneLocal)return;
+ battleDoneLocal=true;
+ await update(ref(db,"battles/"+battleId),{status:"done"}).catch(()=>{});
+}
+function cleanupBattle(){
+ if(battleUnsub){battleUnsub();battleUnsub=null}
+ if(countdownTimer){clearInterval(countdownTimer);countdownTimer=null}
+ currentBattleId=null;coopRole=null;battleDoneLocal=false;
+}
+</script>
+</body>
+</html>
