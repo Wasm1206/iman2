@@ -1,0 +1,495 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#08091c">
+
+<title>بازی موقتاً از دسترس خارج است</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    padding: 20px;
+    font-family: 'Vazirmatn', Tahoma, sans-serif;
+    color: #fff;
+    background: #070816;
+    position: relative;
+    isolation: isolate;
+}
+
+/* پس زمینه متحرک آبی و بنفش */
+
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    inset: -30%;
+    z-index: -2;
+    filter: blur(70px);
+    pointer-events: none;
+}
+
+body::before {
+    background:
+        radial-gradient(
+            ellipse at 20% 25%,
+            rgba(48, 82, 255, .6),
+            transparent 40%
+        ),
+        radial-gradient(
+            ellipse at 80% 70%,
+            rgba(160, 40, 255, .5),
+            transparent 42%
+        ),
+        radial-gradient(
+            ellipse at 50% 100%,
+            rgba(25, 120, 255, .3),
+            transparent 35%
+        );
+
+    animation: colorDrift 13s ease-in-out infinite alternate;
+}
+
+body::after {
+    background:
+        radial-gradient(
+            ellipse at 75% 15%,
+            rgba(235, 61, 216, .25),
+            transparent 35%
+        ),
+        radial-gradient(
+            ellipse at 15% 85%,
+            rgba(35, 70, 255, .3),
+            transparent 40%
+        );
+
+    animation: colorDrift 17s ease-in-out infinite alternate-reverse;
+}
+
+/* نورهای شناور */
+
+.glow-orb {
+    position: fixed;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    filter: blur(75px);
+    opacity: .25;
+    z-index: -1;
+    pointer-events: none;
+    animation: float 11s ease-in-out infinite;
+}
+
+.orb-one {
+    background: #4f46e5;
+    top: 8%;
+    left: -90px;
+}
+
+.orb-two {
+    background: #d946ef;
+    bottom: 0;
+    right: -90px;
+    animation-delay: -5s;
+}
+
+/* کارت اصلی */
+
+.card {
+    width: min(100%, 510px);
+    position: relative;
+    padding: clamp(22px, 5vw, 38px);
+    text-align: center;
+
+    border: 1px solid rgba(180, 160, 255, .23);
+    border-radius: 30px;
+
+    background: linear-gradient(
+        145deg,
+        rgba(22, 23, 54, .82),
+        rgba(10, 12, 31, .78)
+    );
+
+    box-shadow:
+        0 25px 90px rgba(28, 15, 110, .32),
+        inset 0 1px 0 rgba(255,255,255,.08);
+
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+
+    opacity: 0;
+    transform: translateY(28px) scale(.96);
+
+    animation: cardEnter .9s cubic-bezier(.2,.8,.2,1) .12s forwards;
+}
+
+/* حاشیه گرادیانی */
+
+.card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+
+    background: linear-gradient(
+        135deg,
+        rgba(255,117,230,.55),
+        transparent 35%,
+        rgba(72,117,255,.55)
+    );
+
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+
+    pointer-events: none;
+}
+
+/* عکس بازی */
+
+.hero {
+    width: min(100%, 330px);
+    height: 250px;
+    object-fit: contain;
+    display: block;
+    margin: -4px auto 10px;
+
+    filter: drop-shadow(
+        0 0 25px rgba(92, 55, 255, .25)
+    );
+
+    animation: imageFloat 5s ease-in-out infinite;
+}
+
+/* عنوان */
+
+h1 {
+    font-size: clamp(1.35rem, 4.8vw, 1.85rem);
+    line-height: 1.8;
+    margin: 4px 0;
+    font-weight: 800;
+
+    background: linear-gradient(
+        90deg,
+        #ff9bea,
+        #b9a5ff 48%,
+        #83b9ff
+    );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.subtitle {
+    margin: 0;
+    color: #c8c9e9;
+    font-size: clamp(.95rem, 3vw, 1.05rem);
+    line-height: 2;
+}
+
+/* ساعت شنی و دایره */
+
+.loader-wrap {
+    width: 82px;
+    height: 82px;
+    margin: 28px auto 25px;
+
+    display: grid;
+    place-items: center;
+
+    position: relative;
+}
+
+.loader-ring {
+    position: absolute;
+    inset: 0;
+
+    border-radius: 50%;
+
+    border: 2px solid rgba(155, 135, 255, .18);
+    border-top-color: #ff75e6;
+    border-right-color: #8a7bff;
+
+    box-shadow:
+        0 0 20px rgba(141, 92, 246, .22),
+        inset 0 0 14px rgba(87, 90, 255, .08);
+
+    animation: spin 1.8s linear infinite;
+}
+
+.loader-ring::after {
+    content: "";
+    position: absolute;
+
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+    background: #ff9bed;
+
+    top: 7px;
+    left: 10px;
+
+    box-shadow: 0 0 12px #ff75e6;
+}
+
+.hourglass {
+    font-size: 32px;
+    line-height: 1;
+    display: inline-block;
+
+    filter: drop-shadow(
+        0 0 10px rgba(255, 117, 230, .35)
+    );
+
+    animation: flip 3.6s ease-in-out infinite;
+}
+
+/* دکمه روبیکا */
+
+.button {
+    position: relative;
+    isolation: isolate;
+
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    width: min(100%, 290px);
+    min-height: 56px;
+    padding: 14px 24px;
+
+    border-radius: 17px;
+    text-decoration: none;
+    color: #fff;
+
+    font: 700 1rem 'Vazirmatn', Tahoma, sans-serif;
+
+    background: linear-gradient(
+        110deg,
+        #6947e8,
+        #a33fe0 52%,
+        #476eff
+    );
+
+    box-shadow:
+        0 10px 30px rgba(106, 67, 230, .3),
+        inset 0 1px 0 rgba(255,255,255,.24);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        filter .25s ease;
+
+    overflow: hidden;
+}
+
+/* افکت نور روی دکمه */
+
+.button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+
+    background: linear-gradient(
+        110deg,
+        transparent 20%,
+        rgba(255,255,255,.25),
+        transparent 70%
+    );
+
+    transform: translateX(-130%);
+    transition: transform .65s ease;
+}
+
+.button:hover {
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 16px 40px rgba(106,67,230,.48);
+
+    filter: saturate(1.15);
+}
+
+.button:hover::before {
+    transform: translateX(130%);
+}
+
+.button:active {
+    transform: translateY(-1px) scale(.99);
+}
+
+.button svg {
+    width: 21px;
+    height: 21px;
+    fill: currentColor;
+}
+
+.footnote {
+    color: #777da9;
+    font-size: .76rem;
+    margin: 24px 0 0;
+}
+
+/* انیمیشن ها */
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes flip {
+    0%, 42%, 100% {
+        transform: rotate(0deg) scale(1);
+    }
+
+    50% {
+        transform: rotate(180deg) scale(1.08);
+    }
+
+    58% {
+        transform: rotate(180deg) scale(1);
+    }
+}
+
+@keyframes colorDrift {
+    0% {
+        transform: translate3d(-3%, -2%, 0) rotate(0deg) scale(1);
+    }
+
+    100% {
+        transform: translate3d(4%, 3%, 0) rotate(12deg) scale(1.12);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-35px) scale(1.12);
+    }
+}
+
+@keyframes imageFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-7px);
+    }
+}
+
+@keyframes cardEnter {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* موبایل */
+
+@media (max-width: 420px) {
+    .hero {
+        height: 215px;
+    }
+
+    .card {
+        border-radius: 25px;
+    }
+}
+
+/* کاهش انیمیشن برای تنظیمات دسترسی */
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="glow-orb orb-one"></div>
+<div class="glow-orb orb-two"></div>
+
+<main class="card">
+
+    <!-- تصویر بازی -->
+    <img
+        class="hero"
+        src="image.jpg"
+        alt="تصویر بازی"
+    >
+
+    <!-- پیام اصلی -->
+    <h1>
+        بازی فعلاً از دسترس خارج شده است
+    </h1>
+
+    <p class="subtitle">
+        بعداً امتحان کنید
+    </p>
+
+    <!-- ساعت شنی متحرک -->
+    <div class="loader-wrap">
+
+        <div class="loader-ring"></div>
+
+        <span class="hourglass">
+            ⌛
+        </span>
+
+    </div>
+
+    <!-- دکمه کانال روبیکا -->
+    <a
+        class="button"
+        href="https://rubika.ir/WOLF_RED_game"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+
+        <svg viewBox="0 0 24 24">
+            <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.65 6.8-1.55 7.3c-.12.52-.43.65-.87.4l-2.4-1.77-1.16 1.12c-.13.13-.24.24-.5.24l.17-2.43 4.42-3.99c.19-.17-.04-.27-.3-.1L8.99 13.1l-2.37-.74c-.52-.16-.53-.52.11-.77l9.27-3.58c.43-.16.81.1.65.79Z"/>
+        </svg>
+
+        کانال روبیکا
+
+    </a>
+
+    <p class="footnote">
+        ممنون از صبوری شما 💜
+    </p>
+
+</main>
+
+</body>
+</html>
