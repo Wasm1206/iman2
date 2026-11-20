@@ -1,0 +1,1060 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0c1422">
+<title>پنالتی کینگ</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0c1422;--card:#16213a;--card2:#1f2d4d;--acc:#ffd23f;--ok:#2fd27a;--bad:#ff5a5f;--tx:#eef3ff;--mut:#93a3c4}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:Vazirmatn,Tahoma,sans-serif;touch-action:none;user-select:none;-webkit-user-select:none}
+canvas{position:fixed;inset:0;display:block}
+button,input,select,textarea{font-family:inherit;font-size:15px}
+.btn{border:0;border-radius:14px;padding:13px 16px;background:var(--card2);color:var(--tx);font-weight:700;cursor:pointer;transition:transform .08s,filter .15s}
+.btn:active{transform:scale(.96)}.btn.p{background:var(--acc);color:#241a00}.btn.g{background:var(--ok);color:#00230f}.btn.r{background:var(--bad);color:#fff}
+.btn.s{padding:8px 12px;font-size:13px;border-radius:10px}.btn:disabled{opacity:.4}
+.screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(6,10,20,.86);backdrop-filter:blur(6px);z-index:30;overflow:auto;padding:16px;touch-action:pan-y}
+.screen.on{display:flex}
+.panel{width:min(460px,100%);background:var(--card);border-radius:22px;padding:20px;box-shadow:0 20px 60px #0008;margin:auto}
+h1{margin:0 0 4px;font-size:34px;font-weight:900;text-align:center;color:var(--acc)}h2{margin:0 0 12px;font-size:20px}h3{margin:14px 0 8px;font-size:14px;color:var(--mut)}
+.sub{text-align:center;color:var(--mut);margin-bottom:18px;font-size:14px}
+.col{display:flex;flex-direction:column;gap:10px}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.wrap{flex-wrap:wrap}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{flex:1 1 30%;padding:11px 6px;border-radius:12px;background:var(--card2);text-align:center;font-weight:700;cursor:pointer;border:2px solid transparent;font-size:14px}
+.chip.on{border-color:var(--acc);background:#3a3410;color:var(--acc)}.chip small{display:block;color:var(--mut);font-weight:400;font-size:11px;margin-top:2px}
+input,select,textarea{width:100%;background:#0e182c;border:1px solid #2c3d63;color:var(--tx);border-radius:12px;padding:12px;outline:none;user-select:text;-webkit-user-select:text}
+input:focus,textarea:focus{border-color:var(--acc)}textarea{height:92px;direction:ltr;font-family:monospace;font-size:12px}
+.item{display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:12px;padding:9px 12px}.item b{flex:1;overflow:hidden;text-overflow:ellipsis}
+.dot{width:10px;height:10px;border-radius:50%;background:#556;flex:none}.dot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.err{color:var(--bad);font-size:13px;min-height:18px}.hint{color:var(--mut);font-size:12.5px;line-height:1.8}
+.badge{background:var(--bad);color:#fff;border-radius:99px;padding:1px 8px;font-size:12px}
+#hud{position:fixed;top:0;left:0;right:0;padding:calc(8px + env(safe-area-inset-top)) 10px 0;display:none;z-index:10;pointer-events:none}
+#hud.on{display:block}
+.sb{direction:ltr;display:flex;align-items:stretch;gap:6px;background:#0b1224d9;border-radius:16px;padding:6px;backdrop-filter:blur(4px)}
+.team{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:2px 4px;border-radius:10px;min-width:0}.team.act{background:#ffd23f22}
+.team .nm{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.dots{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;min-height:14px}.dots i{width:12px;height:12px;border-radius:50%;border:2px solid #556;display:block}.dots i.g{background:var(--ok);border-color:var(--ok)}.dots i.m{background:var(--bad);border-color:var(--bad)}
+.sc{font-size:26px;font-weight:900;display:flex;align-items:center;padding:0 8px;direction:ltr;gap:6px}
+#info{text-align:center;font-size:12px;color:#cfe;margin-top:4px;text-shadow:0 1px 3px #000}
+#exitBtn{position:fixed;top:calc(86px + env(safe-area-inset-top));left:10px;z-index:12;display:none;pointer-events:auto;padding:6px 10px;font-size:12px;border-radius:10px;border:0;background:#0b1224cc;color:#fff}
+#exitBtn.on{display:block}
+#banner{position:fixed;left:0;right:0;top:34%;text-align:center;font-size:54px;font-weight:900;z-index:15;pointer-events:none;opacity:0;text-shadow:0 4px 20px #000a;-webkit-text-stroke:3px #0a1a10;paint-order:stroke fill;transform:scale(.6)}
+#banner.on{animation:pop 1.9s ease forwards}
+@keyframes pop{0%{opacity:0;transform:scale(.4)}15%{opacity:1;transform:scale(1.15)}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(1.05)}}
+#speed{position:fixed;left:0;right:0;top:calc(120px + env(safe-area-inset-top));text-align:center;font-size:26px;font-weight:900;color:#fff;z-index:14;pointer-events:none;opacity:0;text-shadow:0 2px 10px #000a;direction:ltr}
+#speed.on{animation:spd 1.7s ease forwards}@keyframes spd{0%{opacity:0;transform:translateY(14px) scale(.7)}15%{opacity:1;transform:none}70%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
+.stat{display:flex;align-items:center;justify-content:space-between;background:#1f2d4d;border-radius:10px;padding:7px 14px;margin-top:6px;color:#fff;direction:ltr}.stat span{color:#93a3c4;font-size:12.5px}
+#toast{position:fixed;left:50%;top:calc(96px + env(safe-area-inset-top));transform:translateX(-50%);background:#0b1224e6;padding:9px 16px;border-radius:99px;z-index:14;font-size:14px;font-weight:700;max-width:92vw;text-align:center;opacity:0;transition:opacity .25s;pointer-events:none}
+#toast.on{opacity:1}
+#ctl{position:fixed;left:0;right:0;bottom:0;padding:10px 14px calc(14px + env(safe-area-inset-bottom));display:none;z-index:12;pointer-events:none}
+#ctl.on{display:block}#ctl>*{pointer-events:auto}
+.sl{display:flex;align-items:center;gap:8px;background:#0b1224d9;border-radius:14px;padding:8px 12px;margin-top:6px;font-size:13px;font-weight:700}
+.sl span{width:64px;flex:none}.sl input{padding:0;height:26px;background:none;border:0;accent-color:var(--acc);touch-action:pan-x}
+#stick{position:fixed;width:130px;height:130px;border-radius:50%;border:2px solid #fff6;background:#ffffff14;display:none;z-index:11;pointer-events:none;margin:-65px 0 0 -65px}
+#knob{position:absolute;width:54px;height:54px;border-radius:50%;background:#ffd23fcc;left:38px;top:38px;box-shadow:0 2px 10px #0008}
+#diveBtn{position:fixed;right:18px;bottom:calc(30px + env(safe-area-inset-bottom));width:92px;height:92px;border-radius:50%;border:0;background:#ff7a2fe0;color:#fff;font-weight:900;font-size:16px;z-index:13;display:none;box-shadow:0 6px 20px #0008}
+#diveBtn.on{display:block}#diveBtn:active{transform:scale(.92)}
+#kHint{position:fixed;left:12px;right:120px;bottom:calc(60px + env(safe-area-inset-bottom));text-align:center;color:#fff9;font-size:13px;display:none;z-index:9;pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<div id="hud"><div class="sb"><div class="team" id="t0"><div class="nm" id="n0">تو</div><div class="dots" id="d0"></div></div><div class="sc"><span id="s0">0</span>:<span id="s1">0</span></div><div class="team" id="t1"><div class="nm" id="n1">ربات</div><div class="dots" id="d1"></div></div></div><div id="info"></div></div>
+<button id="exitBtn">✕ خروج</button>
+<div id="banner"></div><div id="speed"></div><div id="toast"></div>
+<div id="ctl">
+  <div id="shootCtl">
+    <div class="sl"><span>ارتفاع</span><input type="range" id="loft" min="0" max="100" value="22"><span style="width:auto" id="loftV">⬆</span></div>
+    <div class="sl"><span>چرخش</span><input type="range" id="spin" min="-100" max="100" value="0"><span style="width:auto" id="spinV">↔</span></div>
+  </div>
+</div>
+<div id="stick"><div id="knob"></div></div>
+<button id="diveBtn">شیرجه</button>
+<div id="kHint">انگشتت را بکش تا دروازه‌بان حرکت کند • «شیرجه» را بزن</div>
+
+<!-- منو -->
+<div class="screen on" id="sMenu"><div class="panel col">
+  <h1>⚽ پنالتی کینگ</h1><div class="sub">ضربه‌ی پنالتی از نمای بالا — بکش، بچرخان، گل بزن</div>
+  <button class="btn p" id="bBot">🤖 بازی با ربات</button>
+  <button class="btn g" id="bOnline">🌐 بازی آنلاین با دوستان</button>
+  <div class="row"><button class="btn" id="bSound">🔊 صدا: روشن</button><button class="btn" id="bHelp">❓ راهنما</button></div>
+</div></div>
+
+<div class="screen" id="sHelp"><div class="panel col"><h2>راهنما</h2>
+  <div class="hint" style="font-size:14px">
+  <b>🎯 شوت‌زن:</b> انگشتت را از روی صفحه <b>به عقب بکش</b> (مثل فلاخن) و رها کن. جهت = برعکس کشیدن، قدرت = طول کشیدن. نقطه‌چین مسیر را نشان می‌دهد.<br>
+  <b>⬆ ارتفاع:</b> اسلایدر پایین؛ بالا = توپ هوایی. <b>↔ چرخش:</b> توپ را به چپ/راست می‌پیچاند. با قدرت زیاد و بدون چرخش توپ «ناکل» می‌شود و می‌لرزد!<br>
+  <b>🧤 دروازه‌بان:</b> انگشت را بکش (جوی‌استیک آنالوگ) و با دکمه‌ی «شیرجه» (یا Space) شیرجه بزن. کیبورد: WASD/فلش.<br>
+  <b>🌦 محیط‌ها:</b> باد، باران، برف، شن و مریخ روی مسیر توپ اثر دارند؛ فلش باد گوشه‌ی صفحه است.
+  </div><button class="btn p" data-go="sMenu">باشه</button></div></div>
+
+<!-- تنظیم بازی با ربات -->
+<div class="screen" id="sBot"><div class="panel col"><h2>🤖 بازی با ربات</h2>
+  <h3>سطح ربات</h3><div class="chips" id="lvChips"></div>
+  <h3>محیط</h3><div class="chips" id="envChips"></div>
+  <div class="row" style="margin-top:8px"><button class="btn" data-go="sMenu">بازگشت</button><button class="btn p" id="bStartBot">شروع!</button></div>
+</div></div>
+
+<!-- آنلاین -->
+<div class="screen" id="sOnline"><div class="panel col" id="onlinePanel"></div></div>
+<div class="screen" id="sWait"><div class="panel col"><h2 id="waitT">در انتظار دوستت…</h2><div class="hint" id="waitS">دعوت فرستاده شد. وقتی قبول کند بازی شروع می‌شود.</div><button class="btn r" id="bCancelWait">لغو</button></div></div>
+
+<!-- پایان -->
+<div class="screen" id="sOver"><div class="panel col" style="text-align:center"><h1 id="ovT">برنده شدی!</h1><div class="sub" id="ovS"></div>
+  <button class="btn p" id="bAgain">🔁 بازی دوباره</button><button class="btn" id="bToMenu">منوی اصلی</button><div class="hint" id="ovH"></div></div></div>
+
+<script>
+/* ⬇️ آدرس Realtime Database فایربیس خودت را اینجا بگذار (فقط همین یک خط لازم است).
+   مثال:  "https://penalty-king-default-rtdb.firebaseio.com"
+   یا خالی بگذار و موقع اجرا در بخش «بازی آنلاین» Paste کن. */
+window.FIREBASE_DB_URL = "";
+</script><script>
+'use strict';
+/* ========== CORE: فیزیک توپ، دروازه‌بان، ربات‌ها، قوانین مسابقه ========== */
+const Core = (() => {
+  const HALF = 3.66, GOAL_H = 2.44, NET_D = 2.2, SPOT = 11, BR = 0.11;
+  const WALK = 4.2, DIVE_V = 7.5, DIVE_T = 0.4;
+
+  // g: گرانش، fric: اصطکاک زمین، wind: حداکثر باد، bounce: جهندگی، drag: مقاومت هوا، mag: شدت چرخش
+  const ENVS = {
+    stadium: { id: 'stadium', name: 'استادیوم شب', g: 9.81, fric: 0.5, wind: 1.5, bounce: 0.6, drag: 1, mag: 1 },
+    rain:    { id: 'rain',    name: 'باران و طوفان', g: 9.81, fric: 0.22, wind: 6, bounce: 0.5, drag: 1.05, mag: 1 },
+    beach:   { id: 'beach',   name: 'ساحل', g: 9.81, fric: 1.7, wind: 4, bounce: 0.33, drag: 1, mag: 1 },
+    snow:    { id: 'snow',    name: 'برف', g: 9.81, fric: 0.9, wind: 6.5, bounce: 0.4, drag: 1.1, mag: 0.9 },
+    futsal:  { id: 'futsal',  name: 'سالن فوتسال', g: 9.81, fric: 0.45, wind: 0, bounce: 0.78, drag: 1, mag: 1.1 },
+    mars:    { id: 'mars',    name: 'مریخ', g: 3.72, fric: 0.6, wind: 2.5, bounce: 0.62, drag: 0.35, mag: 0.6 }
+  };
+
+  const LEVELS = [
+    { id: 0, name: 'آسان',   react: 0.50, err: 1.30, spd: 0.80, dive: 0.60, guess: 0.30, aimErr: 0.95, pow: [0.40, 0.72], corner: 0.15, spin: 0 },
+    { id: 1, name: 'متوسط',  react: 0.36, err: 0.80, spd: 0.92, dive: 0.80, guess: 0.15, aimErr: 0.55, pow: [0.55, 0.85], corner: 0.50, spin: 0.1 },
+    { id: 2, name: 'سخت',    react: 0.28, err: 0.55, spd: 1.00, dive: 0.92, guess: 0.05, aimErr: 0.30, pow: [0.68, 0.95], corner: 0.75, spin: 0.25 },
+    { id: 3, name: 'حرفه‌ای', react: 0.23, err: 0.40, spd: 1.03, dive: 0.97, guess: 0.0, aimErr: 0.16, pow: [0.78, 1.00], corner: 0.90, spin: 0.4 },
+    { id: 4, name: 'جهنم',   react: 0.185, err: 0.30, spd: 1.10, dive: 1.0, guess: 0.0, aimErr: 0.08, pow: [0.88, 1.00], corner: 0.97, spin: 0.55 }
+  ];
+
+  function rng(seed) { // mulberry32
+    let a = (seed >>> 0) || 1;
+    return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  const gauss = r => { let u = 0, v = 0; while (!u) u = r(); v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(6.2832 * v); };
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  function windFor(env, seed, kick) {
+    const r = rng((seed * 2654435761 + kick * 97 + 13) >>> 0); r(); r();
+    const m = env.wind * (0.35 + 0.65 * r()), a = r() * 6.2832;
+    return { x: m * Math.cos(a), y: m * Math.sin(a) * 0.5 };
+  }
+
+  /* ---------- توپ ---------- */
+  function launch(shot, env, wind) {
+    const speed = 11 + 21 * clamp(shot.pow, 0, 1);
+    const el = clamp(shot.loft, 0, 1) * 0.5;
+    const vh = speed * Math.cos(el);
+    return { x: 0, y: SPOT, z: 0.02, vx: vh * Math.sin(shot.ang), vy: -vh * Math.cos(shot.ang), vz: speed * Math.sin(el),
+      t: 0, spin: clamp(shot.spin, -1, 1), pow: clamp(shot.pow, 0, 1), seed: shot.seed || 1, wind: wind || { x: 0, y: 0 },
+      cross: null, result: null, resT: 0, post: false, fx: [], saveType: null, done: false, netHit: null, rot: 0, rolled: 0 };
+  }
+
+  function setResult(b, r) { if (!b.result) { b.result = r; b.resT = b.t; } }
+
+  function stepBall(b, k, dt, env) {
+    b.t += dt;
+    const air = b.z > 0.03;
+    const v = Math.hypot(b.vx, b.vy, b.vz), h = Math.hypot(b.vx, b.vy);
+    const kd = 0.012 * env.drag;
+    let ax = -kd * v * b.vx + b.wind.x * 0.5, ay = -kd * v * b.vy + b.wind.y * 0.5, az = -env.g - kd * v * b.vz;
+    if (air && h > 0.1) {
+      const px = -b.vy / h, py = b.vx / h;
+      let lat = b.spin * 0.75 * h * env.mag;
+      const kn = Math.max(0, b.pow - 0.7) / 0.3 * (1 - Math.abs(b.spin)); // ضربه‌ی ناکل: لرزش
+      lat += kn * 5.5 * Math.sin(b.t * 11 + b.seed * 6.2832);
+      ax += px * lat; ay += py * lat;
+      az += kn * 2.2 * Math.sin(b.t * 7 + b.seed * 3.1);
+    }
+    if (b.cross === 'in') { const d = 1 - 3.5 * dt; b.vx *= d; b.vy *= d; b.vz *= d; }
+    b.vx += ax * dt; b.vy += ay * dt; b.vz += az * dt;
+    const py0 = b.y;
+    b.x += b.vx * dt; b.y += b.vy * dt; b.z += b.vz * dt;
+
+    // زمین
+    if (b.z <= 0) {
+      b.z = 0;
+      if (b.vz < -0.9) { b.fx.push({ t: 'bounce', x: b.x, y: b.y, s: -b.vz }); b.vz = -b.vz * env.bounce; b.vx *= 0.86; b.vy *= 0.86; } else b.vz = 0;
+    }
+    if (b.z === 0 && b.vz === 0) {
+      const sp = Math.hypot(b.vx, b.vy);
+      if (sp > 0) { const ns = Math.max(0, sp - (env.fric * 2.5 + env.fric * 0.7 * sp) * dt); b.vx *= ns / sp; b.vy *= ns / sp; }
+      b.spin *= 1 - 2 * dt;
+    }
+    // تیرک‌ها
+    for (const sx of [-HALF, HALF]) {
+      const dx = b.x - sx, dy = b.y, d = Math.hypot(dx, dy);
+      if (d < BR + 0.06 && b.z < GOAL_H) {
+        const nx = dx / (d || 1), ny = dy / (d || 1), vn = b.vx * nx + b.vy * ny;
+        if (vn < 0) { b.vx -= 1.55 * vn * nx; b.vy -= 1.55 * vn * ny; b.post = true; b.postHit = { x: sx, t: b.t }; b.fx.push({ t: 'post', x: b.x, y: b.y }); }
+        b.x = sx + nx * (BR + 0.07); b.y = ny * (BR + 0.07);
+      }
+    }
+    // عبور از خط دروازه
+    if (py0 > 0 && b.y <= 0 && !b.cross) {
+      if (Math.abs(b.x) < HALF - 0.1 && Math.abs(b.z - GOAL_H) < BR + 0.05 && b.vy < 0) { // تیرافقی
+        b.vy = Math.abs(b.vy) * 0.45; b.vz = -Math.abs(b.vz) * 0.5 - 1; b.y = 0.15; b.post = true; b.postHit = { x: 0, t: b.t }; b.fx.push({ t: 'post', x: b.x, y: 0 });
+      } else if (Math.abs(b.x) < HALF - 0.1 && b.z < GOAL_H - BR) { b.cross = 'in'; b.fx.push({ t: 'net', x: b.x, y: 0 }); b.netHit = { x: b.x, y: -0.2, t: b.t, s: Math.hypot(b.vx, b.vy) }; }
+      else { b.cross = 'out'; setResult(b, 'miss'); }
+    }
+    // دروازه‌بان
+    if (!b.result && b.cross !== 'out' && b.y > -0.7) {
+      const dx = b.x - k.x, dy = b.y - k.y, d = Math.hypot(dx, dy);
+      const reach = k.dive > 0 ? 1.3 : (k.rec > 0 ? 0.95 : 0.8);
+      if (d < reach && b.z < (k.dive > 0 ? 2.3 : 2.4)) {
+        const sp = Math.hypot(b.vx, b.vy);
+        if (sp > 22 && d > reach * 0.5) { // مشت
+          const nx = dx / (d || 1), ny = dy / (d || 1) + 0.6, nn = Math.hypot(nx, ny);
+          b.vx = nx / nn * sp * 0.4; b.vy = Math.abs(ny / nn) * sp * 0.4; b.vz = 3 + Math.random() * 2; b.saveType = 'parry';
+        } else { b.vx *= 0.05; b.vy *= 0.05; b.vz = Math.min(b.vz, 0) * 0.1; b.saveType = 'catch'; }
+        b.cross = 'saved'; b.fx.push({ t: 'save', x: b.x, y: b.y }); setResult(b, 'save');
+      }
+    }
+    if (b.cross === 'in') {
+      if (!b.result && b.y < -0.25) setResult(b, 'goal');
+      if (b.y < -NET_D) { b.y = -NET_D; b.vy *= -0.1; b.vx *= 0.4; }
+      if (Math.abs(b.x) > HALF - 0.1) { b.x = Math.sign(b.x) * (HALF - 0.1); b.vx *= -0.2; }
+      if (b.z > GOAL_H - 0.1) { b.z = GOAL_H - 0.1; b.vz = -Math.abs(b.vz) * 0.2; }
+    }
+    // ضرب‌المثل چرخش توپ برای نمایش
+    b.rolled += Math.hypot(b.vx, b.vy) * dt; b.rot += (b.spin * 9 + Math.hypot(b.vx, b.vy) * 0.6) * dt;
+    // پایان
+    const sp2 = Math.hypot(b.vx, b.vy, b.vz);
+    if (b.t > 7 || Math.abs(b.x) > 17 || b.y > SPOT + 5 || b.y < -8 || (b.t > 0.6 && sp2 < 0.3 && b.z === 0) ||
+        (b.result && b.t - b.resT > 1.7)) {
+      if (!b.result) setResult(b, 'miss');
+      b.done = true;
+    }
+  }
+
+  /* ---------- دروازه‌بان ---------- */
+  function createKeeper() { return { x: 0, y: 0.5, vx: 0, vy: 0, dive: 0, dvx: 0, dvy: 0, cool: 0, rec: 0, dir: 0 }; }
+  function keeperStep(k, inp, dt, spd = 1) {
+    k.cool = Math.max(0, k.cool - dt); k.rec = Math.max(0, k.rec - dt);
+    if (k.dive > 0) {
+      const f = 0.55 + 0.9 * (k.dive / DIVE_T);
+      k.x += k.dvx * DIVE_V * spd * f * dt; k.y += k.dvy * DIVE_V * spd * f * dt * 0.5;
+      k.dive -= dt; if (k.dive <= 0) { k.dive = 0; k.rec = 0.7; k.vx = k.vy = 0; }
+    } else if (inp.dive && k.cool <= 0 && k.rec <= 0) {
+      let dx = inp.x, dy = inp.y; const m = Math.hypot(dx, dy);
+      if (m < 0.25) { dx = inp.dx || (k.dir || 1); dy = 0; } else { dx /= m; dy /= m; }
+      k.dive = DIVE_T; k.dvx = dx; k.dvy = dy; k.cool = 1.4; k.dir = dx;
+    } else {
+      const m = Math.hypot(inp.x, inp.y), s = m > 1 ? 1 / m : 1, tv = WALK * spd * (k.rec > 0 ? 0.3 : 1);
+      k.vx += (inp.x * s * tv - k.vx) * Math.min(1, 10 * dt); k.vy += (inp.y * s * tv * 0.7 - k.vy) * Math.min(1, 10 * dt);
+      k.x += k.vx * dt; k.y += k.vy * dt; if (Math.abs(k.vx) > 0.3) k.dir = Math.sign(k.vx);
+    }
+    k.x = clamp(k.x, -HALF - 0.4, HALF + 0.4); k.y = clamp(k.y, -0.4, 2.2);
+  }
+
+  /* ---------- شبیه‌سازی کامل (برای ربات و تست) ---------- */
+  function cross(shot, env, wind, keeperFn, dt = 1 / 120) {
+    const b = launch(shot, env, wind), k = createKeeper(); let cr = null;
+    if (!keeperFn) k.x = 99; // بدون دروازه‌بان (برای پیش‌بینی)
+    while (!b.done && b.t < 3) {
+      if (keeperFn) keeperFn(k, b, dt);
+      const py = b.y; stepBall(b, k, dt, env);
+      if (!cr && py > 0 && b.y <= 0) cr = { x: b.x, z: b.z, t: b.t };
+      if (!keeperFn && cr) break;
+    }
+    return { b, cr: cr || { x: b.x, z: b.z, t: b.t } };
+  }
+
+  /* ---------- ربات شوتر ---------- */
+  function solveShot(tx, tz, pow, spin, env, wind, seed) {
+    let ang = Math.atan2(tx, SPOT), loft = 0.08 + tz * 0.09;
+    for (let i = 0; i < 9; i++) {
+      const { cr } = cross({ ang, pow, spin, loft, seed }, env, wind, null);
+      ang += Math.atan2(tx - cr.x, SPOT) * 0.9;
+      loft = clamp(loft + (tz - cr.z) * 0.11, 0, 1);
+    }
+    return { ang, pow, spin, loft, seed };
+  }
+  function botShot(level, env, wind, r, seed) {
+    const L = LEVELS[level];
+    let tx, tz;
+    if (r() < L.corner) { tx = (r() < 0.5 ? -1 : 1) * (HALF - (level >= 3 ? 0.2 + r() * 0.2 : 0.4 + r() * 0.25)); tz = r() < 0.5 ? 0.2 + r() * 0.2 : 1.8 + r() * 0.3; }
+    else { tx = (r() * 2 - 1) * 2.8; tz = 0.3 + r() * 1.3; }
+    tx += gauss(r) * L.aimErr; tz += gauss(r) * L.aimErr * 0.5;
+    const pow = L.pow[0] + r() * (L.pow[1] - L.pow[0]);
+    const spin = r() < L.spin ? (r() < 0.5 ? -1 : 1) * (0.35 + r() * 0.4) : 0;
+    return solveShot(tx, Math.max(0.1, tz), pow, spin, env, wind, seed);
+  }
+
+  /* ---------- ربات دروازه‌بان ---------- */
+  class BotKeeper {
+    constructor(level, r) { this.L = LEVELS[level]; this.r = r; this.t = 0; this.plan = null; }
+    start(shot, env, wind) {
+      const { cr } = cross(shot, env, wind, null);
+      const L = this.L, r = this.r;
+      this.tc = cr.t; this.cz = cr.z;
+      this.aimX = cr.x + gauss(r) * L.err;
+      this.guess = r() < L.guess; this.gx = (r() < 0.5 ? -1 : 1) * (1.2 + r() * 2.2);
+      this.useless = Math.abs(cr.x) > HALF + 0.9 || cr.z > GOAL_H + 0.5; // بیرون می‌رود
+      this.dived = false; this.t = 0; this.willDive = r() < L.dive; this.running = true;
+    }
+    update(k, dt) {
+      if (!this.running) return { x: 0, y: 0 };
+      this.t += dt;
+      if (this.t < this.L.react) return { x: 0, y: 0 };
+      const tx = this.guess ? this.gx : this.aimX, dx = tx - k.x, left = this.tc - this.t;
+      const inp = { x: clamp(dx * 3.5, -1, 1), y: clamp((0.45 - k.y) * 2, -1, 1), dive: false };
+      if (!this.dived && this.willDive && !this.useless && Math.abs(dx) > 0.7 && left <= DIVE_T * 0.95 + 0.04) {
+        inp.dive = true; inp.x = Math.sign(dx); inp.y = this.cz < 0.8 ? 0.15 : -0.1; inp.dx = Math.sign(dx); this.dived = true;
+      }
+      return inp;
+    }
+  }
+
+  /* ---------- قوانین مسابقه ---------- */
+  class Match {
+    constructor() { this.kicks = []; }
+    push(goal) { this.kicks.push(!!goal); }
+    shooter(k) { return k % 2; }
+    get stats() {
+      const s = [0, 0], n = [0, 0];
+      this.kicks.forEach((g, i) => { const w = i % 2; n[w]++; if (g) s[w]++; });
+      let over = false, winner = -1;
+      if (n[0] <= 5 && n[1] <= 5) {
+        const rem = [Math.max(0, 5 - n[0]), Math.max(0, 5 - n[1])];
+        if (s[0] > s[1] + rem[1]) { over = true; winner = 0; }
+        else if (s[1] > s[0] + rem[0]) { over = true; winner = 1; }
+        else if (n[0] === 5 && n[1] === 5 && s[0] !== s[1]) { over = true; winner = s[0] > s[1] ? 0 : 1; }
+      } else if (n[0] === n[1] && s[0] !== s[1]) { over = true; winner = s[0] > s[1] ? 0 : 1; }
+      return { s, n, over, winner, sudden: n[0] >= 5 && n[1] >= 5 };
+    }
+  }
+
+  return { ENVS, LEVELS, HALF, GOAL_H, NET_D, SPOT, BR, WALK, DIVE_T, rng, gauss, clamp, windFor, launch, stepBall,
+    createKeeper, keeperStep, cross, solveShot, botShot, BotKeeper, Match };
+})();
+if (typeof module !== 'undefined') module.exports = Core;
+'use strict';
+/* ========== PEOPLE: رسم بازیکن و دروازه‌بان (نمای از بالا) ========== */
+const People = (() => {
+  const TAU = Math.PI * 2;
+  const shade = (hex, f) => { const n = parseInt(hex.slice(1), 16), r = Math.max(0, Math.min(255, (n >> 16) * f)), g = Math.max(0, Math.min(255, ((n >> 8) & 255) * f)), b = Math.max(0, Math.min(255, (n & 255) * f)); return `rgb(${r | 0},${g | 0},${b | 0})`; };
+
+  /* o: x,y (px)، s (پیکسل بر متر)، face (رادیان؛ ۰ = رو به بالا)، kit، skin، hair، num، glove، arms:[{a,l},{a,l}] (زاویه نسبت به جلو، طول به متر)،
+        stride (-1..1 حرکت پا)، kickLeg (0..1)، z (ارتفاع پرش)، stretch (۱ = کشیده در شیرجه)، lie (۰..۱ خوابیده)، back (عدد پشت پیراهن)، tilt */
+  function draw(g, o) {
+    const S = o.s, z = o.z || 0, st = o.stretch || 0, lie = o.lie || 0;
+    g.save(); g.translate(o.x, o.y);
+    g.fillStyle = `rgba(0,0,0,${0.32 / (1 + z)})`; g.beginPath(); g.ellipse(S * (0.1 + z * 0.3), S * (0.12 + z * 0.4), S * (0.5 + st * 0.35), S * 0.3, o.face || 0, 0, TAU); g.fill();
+    g.translate(0, -z * S * 0.35); g.rotate(o.face || 0);
+    const sc = 1 + z * 0.25; g.scale(sc, sc);
+    // پاها
+    const sw = (o.stride || 0), kl = o.kickLeg || 0;
+    const legs = [[-0.15, 0.2 + sw * 0.32 - (kl > 0 ? 0 : 0)], [0.15, 0.2 - sw * 0.32 - kl * 0.75]];
+    for (const [lx, ly] of legs) { g.fillStyle = o.short || '#1b2236'; g.beginPath(); g.ellipse(S * lx, S * (ly - 0.02 + st * 0.5), S * 0.11, S * (0.22 + st * 0.2), 0, 0, TAU); g.fill();
+      g.fillStyle = '#151515'; g.beginPath(); g.ellipse(S * lx, S * (ly + 0.17 + st * 0.7), S * 0.095, S * 0.14, 0, 0, TAU); g.fill(); }
+    // دست‌ها
+    const arms = o.arms || [{ a: 1.3, l: 0.4 }, { a: -1.3, l: 0.4 }];
+    arms.forEach((ar, i) => { const sx0 = S * 0.3 * (i ? 1 : -1) * (1 - lie * 0.2), sy0 = -S * 0.02, hx = sx0 + Math.sin(ar.a) * ar.l * S, hy = sy0 - Math.cos(ar.a) * ar.l * S;
+      g.lineCap = 'round'; g.strokeStyle = o.kit; g.lineWidth = S * 0.16; g.beginPath(); g.moveTo(sx0, sy0); g.lineTo(sx0 + (hx - sx0) * 0.5, sy0 + (hy - sy0) * 0.5); g.stroke();
+      g.strokeStyle = o.skin; g.lineWidth = S * 0.11; g.beginPath(); g.moveTo(sx0 + (hx - sx0) * 0.5, sy0 + (hy - sy0) * 0.5); g.lineTo(hx, hy); g.stroke();
+      g.fillStyle = o.glove || o.skin; g.beginPath(); g.arc(hx, hy, S * (o.glove ? 0.15 : 0.075), 0, TAU); g.fill();
+      if (o.glove) { g.strokeStyle = '#0006'; g.lineWidth = 1.2; g.stroke(); } });
+    // تنه
+    const bw = 0.34 * (1 + lie * 0.1), bh = 0.2 + st * 0.18;
+    const gr = g.createLinearGradient(-S * bw, 0, S * bw, 0); gr.addColorStop(0, shade(o.kit, 0.78)); gr.addColorStop(0.5, o.kit); gr.addColorStop(1, shade(o.kit, 0.78));
+    g.fillStyle = gr; g.beginPath(); g.ellipse(0, 0, S * bw, S * bh, 0, 0, TAU); g.fill();
+    g.strokeStyle = o.kit2 || '#ffffff55'; g.lineWidth = S * 0.04; g.beginPath(); g.moveTo(-S * bw * 0.9, S * 0.02); g.lineTo(S * bw * 0.9, S * 0.02); g.stroke();
+    if (o.back !== undefined) { g.fillStyle = '#ffffffdd'; g.font = `900 ${S * 0.2}px Arial`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.save(); g.translate(0, S * 0.05); g.fillText(o.back, 0, 0); g.restore(); }
+    // سر: مو از بالا دیده می‌شود، صورت جلو (جهت نگاه)
+    const hy2 = -S * (0.06 + st * 0.25);
+    g.fillStyle = o.skin; g.beginPath(); g.arc(0, hy2, S * 0.155, 0, TAU); g.fill();
+    g.fillStyle = o.hair; g.beginPath(); g.arc(0, hy2 + S * 0.025, S * 0.15, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.22)'; g.beginPath(); g.arc(-S * 0.04, hy2 - S * 0.05, S * 0.05, 0, TAU); g.fill();
+    g.restore();
+  }
+
+  const kits = { blue: { kit: '#2f7bff', kit2: '#cfe0ff', short: '#12306b' }, red: { kit: '#e8433f', kit2: '#ffd6d2', short: '#5a1210' }, keeper: { kit: '#ffd23f', kit2: '#ffefa8', short: '#2a2a2a' } };
+  return { draw, kits };
+})();
+'use strict';
+/* ========== RENDER: نمای از بالا، زمین و محیط‌ها، توپ، تور، جلوه‌ها ========== */
+const Render = (() => {
+  const { HALF, NET_D, SPOT } = Core, TAU = Math.PI * 2;
+  const VIS = {
+    stadium: { a: '#208038', b: '#279148', line: '#ffffff', kind: 'arena', crowd: 1, lights: 1, ball: '#fff' },
+    rain:    { a: '#1b4a38', b: '#215742', line: '#dfeaff', kind: 'arena', crowd: 1, weather: 'rain', dim: 1, ball: '#f4f7ff' },
+    beach:   { a: '#ecd08f', b: '#e4c783', line: '#fffbe8', kind: 'beach', ball: '#fff' },
+    snow:    { a: '#eef4fa', b: '#dfe9f3', line: '#d2432f', kind: 'snow', weather: 'snow', ball: '#ff7a2f', post: '#d2432f' },
+    futsal:  { a: '#c98b4b', b: '#bf8140', line: '#ffffff', kind: 'hall', crowd: 1, ball: '#fff' },
+    mars:    { a: '#b24e2a', b: '#a54424', line: '#ffe2cf', kind: 'mars', ball: '#fff' }
+  };
+  const ADS = ['PENALTY KING', '⚽ GOAL!', 'KICK OFF', 'CHAMPION', 'FAIR PLAY', 'SUPER LEAGUE'], ADC = ['#c62828', '#1565c0', '#ef6c00', '#2e7d32', '#6a1b9a', '#00838f'];
+  let cv, ctx, W = 0, H = 0, dpr = 1, sc = 30, yTop = -7, pitch, envId = 'stadium', V = VIS.stadium;
+  let parts = [], rips = [], fx = [], conf = [], shakeAmp = 0, flash = 0, T = 0, cheer = 0, pop = [];
+  const hash = (a, b) => { const s = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return s - Math.floor(s); };
+  const sx = x => W / 2 + x * sc, sy = y => (y - yTop) * sc;
+
+  function init(c) { cv = c; ctx = cv.getContext('2d'); resize(); addEventListener('resize', resize); }
+  function resize() {
+    dpr = Math.min(2, window.devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    sc = Math.min(W / 12, H / 20); yTop = SPOT - 0.70 * H / sc; buildPitch();
+  }
+  function setEnv(id) { envId = id; V = VIS[id] || VIS.stadium; parts = []; rips = []; fx = [];
+    const n = V.weather === 'rain' ? 150 : V.weather === 'snow' ? 110 : 0; for (let i = 0; i < n; i++) parts.push({ x: Math.random(), y: Math.random(), s: 0.5 + Math.random() * 0.9 }); buildPitch(); }
+
+  /* ---------- زمین (یک‌بار روی بوم پنهان) ---------- */
+  function buildPitch() {
+    pitch = document.createElement('canvas'); pitch.width = W * dpr; pitch.height = H * dpr; const g = pitch.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const k = V.kind, edge = sy(-3.4), bottom = H;
+    g.fillStyle = V.a; g.fillRect(0, 0, W, H);
+    // خطوط چمن‌زنی / کف
+    if (k === 'hall') { const pw = sc * 0.55; for (let y = edge, i = 0; y < H; y += pw, i++) { g.fillStyle = i % 2 ? V.a : V.b; g.fillRect(0, y, W, pw + 1); }
+      g.strokeStyle = '#0000001c'; g.lineWidth = 1; for (let y = edge, i = 0; y < H; y += pw, i++) { for (let x = ((i * 37) % 90); x < W; x += sc * 2.6) { g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + pw); g.stroke(); } } }
+    else { const band = 2.2 * sc; for (let y = edge, i = 0; y < H; y += band, i++) { g.fillStyle = i % 2 ? V.a : V.b; g.fillRect(0, y, W, band + 1); }
+      if (k === 'beach') { g.strokeStyle = '#b98f4a30'; g.lineWidth = 2; for (let y = edge + 10; y < H; y += 16) { g.beginPath(); for (let x = 0; x <= W; x += 10) g.lineTo(x, y + Math.sin(x / 23 + y / 7) * 3); g.stroke(); } }
+      if (k === 'mars') for (let i = 0; i < 26; i++) { const cx = hash(i, 1) * W, cy = edge + hash(i, 2) * (H - edge), r = 8 + hash(i, 3) * 26; g.fillStyle = '#00000022'; g.beginPath(); g.ellipse(cx, cy, r, r * 0.7, 0, 0, TAU); g.fill(); g.strokeStyle = '#ffffff18'; g.lineWidth = 2; g.beginPath(); g.ellipse(cx - 1, cy - 1, r, r * 0.7, 0, 0.2, 2.9); g.stroke(); }
+      if (k === 'snow') { for (let i = 0; i < 40; i++) { g.fillStyle = '#c9d8e8'; g.beginPath(); g.ellipse(hash(i, 5) * W, edge + hash(i, 6) * (H - edge), 6 + hash(i, 7) * 16, 3 + hash(i, 8) * 5, 0, 0, TAU); g.fill(); } } }
+    // نویز بافت
+    for (let i = 0; i < W * H / 70; i++) { g.fillStyle = Math.random() < 0.5 ? 'rgba(0,0,0,.05)' : 'rgba(255,255,255,.05)'; g.fillRect(Math.random() * W, edge + Math.random() * (H - edge), 1.5, 1.5); }
+    if (V.lights) { const gr = g.createRadialGradient(W / 2, sy(6), 10, W / 2, sy(6), H * 0.8); gr.addColorStop(0, 'rgba(255,255,220,.13)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, edge, W, H); }
+    if (V.dim) { g.fillStyle = 'rgba(8,20,50,.28)'; g.fillRect(0, 0, W, H); }
+    // پشت دروازه
+    surround(g, edge);
+    // خط‌های زمین
+    const lw = Math.max(2, sc * 0.11); g.strokeStyle = V.line; g.lineWidth = lw; g.lineCap = 'round'; g.globalAlpha = 0.92;
+    const L = (x1, y1, x2, y2) => { g.beginPath(); g.moveTo(sx(x1), sy(y1)); g.lineTo(sx(x2), sy(y2)); g.stroke(); };
+    L(-30, 0, 30, 0); L(-9.16, 0, -9.16, 5.5); L(-9.16, 5.5, 9.16, 5.5); L(9.16, 5.5, 9.16, 0); L(-20.16, 16.5, 20.16, 16.5); L(-20.16, 0, -20.16, 16.5); L(20.16, 0, 20.16, 16.5);
+    g.beginPath(); g.arc(sx(0), sy(SPOT), 9.15 * sc, Math.PI / 2 - Math.acos(5.5 / 9.15), Math.PI / 2 + Math.acos(5.5 / 9.15)); g.stroke();
+    g.globalAlpha = 1; g.fillStyle = V.line; g.beginPath(); g.arc(sx(0), sy(SPOT), sc * 0.15, 0, TAU); g.fill();
+    // لکه‌ی سایه‌ی پای شوت‌زن روی نقطه
+    g.fillStyle = 'rgba(0,0,0,.12)'; g.beginPath(); g.ellipse(sx(0), sy(SPOT), sc * 0.55, sc * 0.4, 0, 0, TAU); g.fill();
+    if (envId === 'rain') { g.fillStyle = 'rgba(150,190,255,.20)'; for (let i = 0; i < 9; i++) { g.beginPath(); g.ellipse(sx((hash(i, 9) - 0.5) * 11), sy(1.5 + hash(i, 10) * 12), (0.7 + hash(i, 11)) * sc, 0.35 * sc, 0, 0, TAU); g.fill(); } }
+  }
+
+  function surround(g, edge) {
+    const k = V.kind;
+    if (k === 'arena' || k === 'hall') {
+      const gr = g.createLinearGradient(0, 0, 0, edge); gr.addColorStop(0, k === 'hall' ? '#0e1424' : '#080c18'); gr.addColorStop(1, k === 'hall' ? '#2a3350' : '#1b2338'); g.fillStyle = gr; g.fillRect(0, 0, W, edge);
+      g.fillStyle = k === 'hall' ? '#222a40' : '#171e30'; g.fillRect(0, edge - 0.5 * sc, W, 0.5 * sc); // مسیر کنار زمین
+      const bh = 0.55 * sc, by = edge - 0.5 * sc - bh * 0.9, bw = 3.2 * sc; // تابلوهای تبلیغاتی
+      for (let x = -bw, i = 0; x < W + bw; x += bw, i++) { const a = i % 6; g.fillStyle = ADC[a]; g.fillRect(x, by, bw - 2, bh); g.fillStyle = '#ffffff22'; g.fillRect(x, by, bw - 2, bh * 0.35);
+        g.fillStyle = '#fff'; g.font = `900 ${bh * 0.52}px Arial`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(ADS[a], x + bw / 2, by + bh / 2); }
+      g.fillStyle = '#000a'; g.fillRect(0, by + bh, W, 3);
+      for (let y = by - 4, r = 0; y > -10; y -= 0.55 * sc, r++) { g.strokeStyle = '#ffffff0d'; g.lineWidth = 1; g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
+      if (k === 'hall') { for (let i = 0; i < 6; i++) { const lx = W * (i + 0.5) / 6, gr2 = g.createRadialGradient(lx, 10, 2, lx, 10, W / 5); gr2.addColorStop(0, 'rgba(255,255,235,.55)'); gr2.addColorStop(1, 'rgba(255,255,235,0)'); g.fillStyle = gr2; g.fillRect(lx - W / 5, 0, W * 0.4, by); } }
+    } else if (k === 'beach') {
+      const gr = g.createLinearGradient(0, 0, 0, edge); gr.addColorStop(0, '#13a0cf'); gr.addColorStop(0.7, '#6fd9ee'); gr.addColorStop(1, '#bdeff5'); g.fillStyle = gr; g.fillRect(0, 0, W, edge - 1.2 * sc);
+      g.fillStyle = '#d9bb78'; g.fillRect(0, edge - 1.2 * sc, W, 1.3 * sc); g.fillStyle = '#b4915a30'; g.fillRect(0, edge - 0.2 * sc, W, 0.2 * sc);
+      for (const [px, dir] of [[0.12, 1], [0.88, -1]]) { const x = W * px, y = edge - 1.0 * sc; g.fillStyle = '#00000030'; g.beginPath(); g.ellipse(x + 8, y + 10, 24, 9, 0, 0, TAU); g.fill();
+        g.strokeStyle = '#6b4a2a'; g.lineWidth = 5; g.beginPath(); g.moveTo(x, y + 6); g.quadraticCurveTo(x + dir * 8, y - 20, x + dir * 4, y - 40); g.stroke();
+        for (let i = 0; i < 7; i++) { const a = i * TAU / 7; g.strokeStyle = i % 2 ? '#2f9e44' : '#37b24d'; g.lineWidth = 6; g.lineCap = 'round'; g.beginPath(); g.moveTo(x + dir * 4, y - 40); g.quadraticCurveTo(x + dir * 4 + Math.cos(a) * 20, y - 52 + Math.sin(a) * 8, x + dir * 4 + Math.cos(a) * 36, y - 40 + Math.sin(a) * 22); g.stroke(); } }
+      for (const [ux, c] of [[0.3, '#e8433f'], [0.7, '#ffd23f']]) { const x = W * ux, y = edge - 0.6 * sc; g.fillStyle = '#00000025'; g.beginPath(); g.ellipse(x + 6, y + 6, 22, 12, 0, 0, TAU); g.fill(); g.fillStyle = c; g.beginPath(); g.arc(x, y, 22, Math.PI, TAU); g.fill(); g.fillStyle = '#fff8'; g.beginPath(); g.arc(x, y, 22, Math.PI * 1.25, Math.PI * 1.5); g.lineTo(x, y); g.fill(); }
+    } else if (k === 'snow') {
+      const gr = g.createLinearGradient(0, 0, 0, edge); gr.addColorStop(0, '#8fa7c2'); gr.addColorStop(1, '#dbe6f2'); g.fillStyle = gr; g.fillRect(0, 0, W, edge);
+      for (let i = 0; i < 14; i++) { const x = (i + 0.5) * W / 14 + (hash(i, 2) - 0.5) * 20, y = edge - 0.8 * sc - hash(i, 3) * 16, h = 46 + hash(i, 4) * 40; for (let t = 0; t < 3; t++) { g.fillStyle = t % 2 ? '#2f6f4f' : '#256043'; g.beginPath(); g.moveTo(x, y - h + t * 14); g.lineTo(x + 24 - t * 4, y - h * 0.3 + t * 12); g.lineTo(x - 24 + t * 4, y - h * 0.3 + t * 12); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(x, y - h + t * 14); g.lineTo(x + 9, y - h + 14 + t * 14); g.lineTo(x - 9, y - h + 14 + t * 14); g.fill(); } }
+      g.fillStyle = '#f4f8fc'; g.beginPath(); g.moveTo(0, edge); for (let x = 0; x <= W; x += 20) g.lineTo(x, edge - 0.9 * sc + Math.sin(x / 40) * 8); g.lineTo(W, edge); g.fill();
+    } else if (k === 'mars') {
+      const gr = g.createLinearGradient(0, 0, 0, edge); gr.addColorStop(0, '#12070d'); gr.addColorStop(0.7, '#6b2a22'); gr.addColorStop(1, '#c5603a'); g.fillStyle = gr; g.fillRect(0, 0, W, edge);
+      g.fillStyle = '#8f3a1f'; g.beginPath(); g.moveTo(0, edge); for (let x = 0; x <= W; x += 14) g.lineTo(x, edge - 28 - Math.abs(Math.sin(x / 70) * 40) - hash(x, 1) * 12); g.lineTo(W, edge); g.fill();
+      g.fillStyle = '#e8d5c0'; g.beginPath(); g.arc(W * 0.8, edge * 0.35, 20, 0, TAU); g.fill(); g.fillStyle = '#cdb8a2'; g.beginPath(); g.arc(W * 0.8 - 6, edge * 0.35 - 4, 5, 0, TAU); g.fill();
+      g.fillStyle = '#d6c1ac'; g.beginPath(); g.arc(W * 0.25, edge * 0.5, 9, 0, TAU); g.fill();
+    }
+  }
+
+  /* ---------- پویا: تماشاگر، دریا، ستاره ---------- */
+  function backdrop(dt) {
+    const edge = sy(-3.4), k = V.kind;
+    if (V.crowd) {
+      const by = edge - 0.5 * sc - 0.55 * sc * 0.9 - 6, rowH = 0.5 * sc;
+      for (let r = 0, y = by; y > -10; y -= rowH, r++) for (let x = (r % 2) * 5, i = 0; x < W; x += 11, i++) {
+        const h = hash(i, r), hue = h < 0.35 ? 214 : h < 0.7 ? 4 : h * 360, jump = cheer > 0 ? Math.abs(Math.sin(T * 9 + i * 1.7 + r)) * 5 * Math.min(1, cheer) : Math.sin(T * 1.7 + i + r) * 0.6;
+        ctx.fillStyle = `hsl(${hue},55%,${30 + r * 3 % 22}%)`; ctx.beginPath(); ctx.arc(x, y - jump, 4.4, 0, TAU); ctx.fill(); ctx.fillStyle = '#e8b98a'; ctx.beginPath(); ctx.arc(x, y - jump - 5, 2.6, 0, TAU); ctx.fill();
+        if (cheer > 0.3 && h > 0.88) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y - jump - 5); ctx.lineTo(x + Math.sin(T * 10 + i) * 4, y - jump - 17); ctx.stroke(); }
+      }
+      if (Math.random() < 0.18) pop.push({ x: Math.random() * W, y: Math.random() * by, l: 0.12 });
+      for (let i = pop.length - 1; i >= 0; i--) { const p = pop[i]; p.l -= dt; if (p.l <= 0) { pop.splice(i, 1); continue; } const gr = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 16); gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = gr; ctx.fillRect(p.x - 16, p.y - 16, 32, 32); }
+    }
+    if (k === 'beach') { ctx.strokeStyle = '#ffffffb0'; ctx.lineWidth = 3; const wy = edge - 1.25 * sc;
+      for (let r = 0; r < 3; r++) { ctx.beginPath(); for (let x = 0; x <= W; x += 12) { const y = wy - r * 16 - Math.sin(x / 38 + T * 1.3 + r * 2) * 4 - 6 * Math.sin(T * 0.6 + r); x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke(); }
+      ctx.fillStyle = '#ffffffa0'; ctx.beginPath(); for (let x = 0; x <= W; x += 12) { const y = wy + 8 + Math.sin(x / 30 + T * 2) * 4; x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.lineTo(W, wy + 16); ctx.lineTo(0, wy + 16); ctx.fill(); }
+    if (k === 'mars') { ctx.fillStyle = '#fff'; for (let i = 0; i < 50; i++) { ctx.globalAlpha = 0.3 + 0.7 * Math.abs(Math.sin(T * 1.5 + i)); ctx.beginPath(); ctx.arc(hash(i, 21) * W, hash(i, 22) * edge * 0.55, 0.6 + hash(i, 23), 0, TAU); ctx.fill(); } ctx.globalAlpha = 1;
+      ctx.fillStyle = 'rgba(255,170,120,.10)'; for (let i = 0; i < 6; i++) { ctx.beginPath(); ctx.ellipse((T * 30 + i * W / 5) % (W + 200) - 100, edge - 20 - i * 6, 150, 18, 0, 0, TAU); ctx.fill(); } }
+  }
+
+  /* ---------- دروازه ---------- */
+  function goalBack(b) {
+    const x0 = sx(-HALF), x1 = sx(HALF), y0 = sy(0), y1 = sy(-NET_D);
+    ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.fillRect(x0 + 7, y1 + 8, x1 - x0, y0 - y1 + 2);
+    const gr = ctx.createLinearGradient(0, y1, 0, y0); gr.addColorStop(0, 'rgba(0,0,0,.55)'); gr.addColorStop(1, 'rgba(0,0,0,.22)'); ctx.fillStyle = gr; ctx.fillRect(x0, y1, x1 - x0, y0 - y1);
+    ctx.strokeStyle = V.post || '#fff'; ctx.globalAlpha = 0.85; ctx.lineWidth = sc * 0.07; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x0 + 3, y1); ctx.lineTo(x1 - 3, y1); ctx.lineTo(x1, y0); ctx.stroke(); ctx.globalAlpha = 1;
+  }
+  function goalFront(b, t) {
+    const x0 = sx(-HALF), x1 = sx(HALF), y0 = sy(0), y1 = sy(-NET_D), hit = b && b.netHit;
+    const amp = hit ? Math.max(0, 1 - (t - hit.t) * 0.7) * Math.min(1, hit.s / 18) : 0;
+    const disp = (x, y) => { if (amp <= 0) return [x, y]; const dx = x - hit.x, dy = y - hit.y, d = Math.hypot(dx, dy), f = amp * Math.exp(-d * d / 2.2) * Math.cos((t - hit.t) * 18); return [x + dx * f * 0.25, y - 0.5 * Math.abs(f) - dy * f * 0.1]; };
+    ctx.strokeStyle = 'rgba(255,255,255,.5)'; ctx.lineWidth = 1; ctx.beginPath();
+    for (let gx = -HALF; gx <= HALF + 0.01; gx += 0.25) for (let gy = 0, first = true; gy >= -NET_D - 0.001; gy -= 0.1, first = false) { const p = disp(gx, gy); first ? ctx.moveTo(sx(p[0]), sy(p[1])) : ctx.lineTo(sx(p[0]), sy(p[1])); }
+    for (let gy = 0; gy >= -NET_D - 0.01; gy -= 0.25) for (let gx = -HALF, first = true; gx <= HALF + 0.001; gx += 0.1, first = false) { const p = disp(gx, gy); first ? ctx.moveTo(sx(p[0]), sy(p[1])) : ctx.lineTo(sx(p[0]), sy(p[1])); }
+    ctx.stroke();
+    const pc = V.post || '#fff';
+    ctx.fillStyle = 'rgba(0,0,0,.35)'; for (const x of [-HALF, HALF]) { ctx.beginPath(); ctx.arc(sx(x) + 4, y0 + 4, sc * 0.18, 0, TAU); ctx.fill(); }
+    ctx.strokeStyle = 'rgba(0,0,0,.3)'; ctx.lineWidth = sc * 0.16; ctx.beginPath(); ctx.moveTo(x0, y0 + 3); ctx.lineTo(x1, y0 + 3); ctx.stroke();
+    ctx.strokeStyle = pc; ctx.lineWidth = sc * 0.14; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y0); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = sc * 0.04; ctx.beginPath(); ctx.moveTo(x0, y0 - sc * 0.03); ctx.lineTo(x1, y0 - sc * 0.03); ctx.stroke();
+    for (const x of [-HALF, HALF]) { const gr = ctx.createRadialGradient(sx(x) - 2, y0 - 2, 1, sx(x), y0, sc * 0.18); gr.addColorStop(0, '#fff'); gr.addColorStop(1, pc === '#fff' ? '#aab4c4' : pc); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(sx(x), y0, sc * 0.17, 0, TAU); ctx.fill(); ctx.strokeStyle = '#0005'; ctx.lineWidth = 1.5; ctx.stroke(); }
+  }
+
+  /* ---------- بازیکنان ---------- */
+  function keeperDraw(k, pose, t) {
+    const o = { x: sx(k.x), y: sy(k.y), s: sc, face: Math.PI, skin: '#dca874', hair: '#2a1c12', glove: '#ff8a1f', ...People.kits.keeper }, idle = Math.sin(t * 5);
+    if (k.dive > 0 || k.rec > 0) {
+      const dx = k.dvx || k.dir || 1, dy = (k.dvy || 0) * 0.5; o.face = Math.atan2(dx, -dy); const air = k.dive > 0, pr = air ? 1 : Math.max(0, k.rec / 0.7);
+      o.stretch = air ? 1 : 0.7 * pr; o.lie = air ? 0.6 : pr; o.z = air ? 0.25 * Math.sin((1 - k.dive / Core.DIVE_T) * Math.PI) : 0; o.arms = air ? [{ a: -0.16, l: 1.1 }, { a: 0.16, l: 1.1 }] : [{ a: -0.5, l: 0.6 }, { a: 0.5, l: 0.6 }]; o.stride = 0;
+    } else if (pose === 'cheer') { o.z = Math.abs(Math.sin(t * 8)) * 0.35; o.arms = [{ a: -2.4, l: 0.65 }, { a: 2.4, l: 0.65 }]; o.face = Math.PI + Math.sin(t * 3) * 0.6; }
+    else if (pose === 'sad') { o.arms = [{ a: -0.5, l: 0.3 }, { a: 0.5, l: 0.3 }]; }
+    else { o.x += Math.sin(t * 2.4) * sc * 0.05; o.stride = idle * 0.35; o.arms = [{ a: -1.05 + idle * 0.12, l: 0.62 }, { a: 1.05 - idle * 0.12, l: 0.62 }]; }
+    People.draw(ctx, o);
+  }
+  function shooterDraw(s) {
+    const o = { x: sx(s.x), y: sy(s.y), s: sc, face: 0, skin: '#e8b98a', hair: '#1d140c', back: s.num || 9, ...(People.kits[s.kit] || People.kits.blue) }, t = s.t || 0;
+    if (s.pose === 'run') { o.stride = Math.sin(s.run * 16); o.arms = [{ a: -0.6 + o.stride * 0.5, l: 0.42 }, { a: 0.6 - o.stride * 0.5, l: 0.42 }]; }
+    else if (s.pose === 'kick') { o.kickLeg = Math.sin(Math.min(1, s.k) * Math.PI); o.stride = -0.3; o.arms = [{ a: -1.5, l: 0.5 }, { a: 0.9, l: 0.42 }]; }
+    else if (s.pose === 'cheer') { o.z = Math.abs(Math.sin(t * 7)) * 0.4; o.arms = [{ a: -2.5, l: 0.7 }, { a: 2.5, l: 0.7 }]; o.face = Math.sin(t * 2) * 1.2; }
+    else if (s.pose === 'sad') { o.arms = [{ a: -0.35, l: 0.22 }, { a: 0.35, l: 0.22 }]; o.stride = 0; }
+    else { o.stride = Math.sin(t * 3) * 0.1; o.arms = [{ a: -0.7, l: 0.4 }, { a: 0.7, l: 0.4 }]; }
+    People.draw(ctx, o);
+  }
+
+  /* ---------- توپ ---------- */
+  function ballDraw(b, trail) {
+    const z = b ? b.z : 0, x = b ? b.x : 0, y = b ? b.y : SPOT, R = sc * 0.34, rot = b ? b.rot : 0, spd = b ? Math.hypot(b.vx, b.vy) : 0;
+    if (trail && trail.length > 2) for (let i = 1; i < trail.length; i++) { const a = i / trail.length; ctx.strokeStyle = `rgba(255,255,255,${a * 0.42})`; ctx.lineWidth = R * a * 1.3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(sx(trail[i - 1].x), sy(trail[i - 1].y)); ctx.lineTo(sx(trail[i].x), sy(trail[i].y)); ctx.stroke(); }
+    const sh = 1 / (1 + z * 0.12); ctx.fillStyle = `rgba(0,0,0,${0.4 * sh})`; ctx.beginPath(); ctx.ellipse(sx(x + z * 0.3 + 0.05), sy(y + z * 0.42 + 0.05), R * sh * 1.05, R * sh * 0.85, 0, 0, TAU); ctx.fill();
+    const r = R * (1 + z * 0.2), cx = sx(x), cy = sy(y);
+    ctx.save(); ctx.translate(cx, cy);
+    if (spd > 8) { ctx.save(); ctx.rotate(Math.atan2(b.vy, b.vx)); ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.beginPath(); ctx.ellipse(-r * Math.min(2.2, spd / 14), 0, r * Math.min(2.4, spd / 12), r * 0.8, 0, 0, TAU); ctx.fill(); ctx.restore(); }
+    ctx.rotate(rot); const gr = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.1, 0, 0, r); gr.addColorStop(0, '#ffffff'); gr.addColorStop(1, V.ball === '#fff' ? '#c9d0da' : V.ball);
+    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#16181d'; ctx.beginPath(); for (let i = 0; i < 5; i++) { const a = i * 1.2566 - 1.57; ctx.lineTo(Math.cos(a) * r * 0.34, Math.sin(a) * r * 0.34); } ctx.fill();
+    ctx.strokeStyle = '#16181d'; ctx.lineWidth = Math.max(1, r * 0.07);
+    for (let i = 0; i < 5; i++) { const a = i * 1.2566 - 1.57; ctx.beginPath(); ctx.moveTo(Math.cos(a) * r * 0.34, Math.sin(a) * r * 0.34); ctx.lineTo(Math.cos(a) * r * 0.68, Math.sin(a) * r * 0.68); ctx.stroke();
+      ctx.beginPath(); ctx.arc(Math.cos(a + 0.63) * r * 0.86, Math.sin(a + 0.63) * r * 0.86, r * 0.2, 0, TAU); ctx.fill(); }
+    ctx.restore(); ctx.strokeStyle = 'rgba(0,0,0,.45)'; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.beginPath(); ctx.arc(cx - r * 0.35, cy - r * 0.38, r * 0.2, 0, TAU); ctx.fill();
+  }
+
+  /* ---------- هدف‌گیری ---------- */
+  function aimDraw(a) {
+    if (!a || !a.on) return; const bx = sx(0), by = sy(SPOT);
+    ctx.strokeStyle = 'rgba(255,210,63,.65)'; ctx.lineWidth = 3; ctx.setLineDash([3, 7]); ctx.beginPath(); ctx.moveTo(a.from.x, a.from.y); ctx.lineTo(a.to.x, a.to.y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle = '#ffffff80'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(a.from.x, a.from.y, 13, 0, TAU); ctx.stroke(); ctx.fillStyle = '#ffd23f'; ctx.beginPath(); ctx.arc(a.to.x, a.to.y, 10, 0, TAU); ctx.fill();
+    const pv = a.preview || [], n = Math.floor(pv.length * 0.7);
+    for (let i = 0; i < n; i++) { const p = pv[i], al = 1 - i / n; ctx.fillStyle = `rgba(255,255,255,${0.2 + al * 0.8})`; ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(sx(p.x), sy(p.y), 1.6 + p.z * 1.1 + al * 1.8, 0, TAU); ctx.fill(); ctx.stroke(); }
+    if (n > 2) { const p = pv[n - 1]; ctx.strokeStyle = 'rgba(255,210,63,.9)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(sx(p.x), sy(p.y), 7, 0, TAU); ctx.stroke(); }
+    ctx.strokeStyle = `hsl(${120 - a.pow * 120},90%,55%)`; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.beginPath(); ctx.arc(bx, by, sc * 0.9, -Math.PI / 2, -Math.PI / 2 + a.pow * TAU); ctx.stroke();
+  }
+  function windDraw(w) {
+    const m = Math.hypot(w.x, w.y), cx = W - 50, cy = 150; ctx.save(); ctx.translate(cx, cy); ctx.fillStyle = 'rgba(8,14,30,.7)'; ctx.beginPath(); ctx.arc(0, 0, 27, 0, TAU); ctx.fill(); ctx.strokeStyle = '#ffffff30'; ctx.lineWidth = 1.5; ctx.stroke();
+    if (m > 0.2) { ctx.rotate(Math.atan2(w.y, w.x)); ctx.fillStyle = '#9be7ff'; const L = 7 + Math.min(m, 7) * 2; ctx.beginPath(); ctx.moveTo(L, 0); ctx.lineTo(-L * 0.4, -8); ctx.lineTo(-L * 0.15, 0); ctx.lineTo(-L * 0.4, 8); ctx.fill(); }
+    ctx.restore(); ctx.fillStyle = '#fff'; ctx.font = '700 10px Vazirmatn,Tahoma,sans-serif'; ctx.textAlign = 'center'; ctx.fillText('WIND ' + m.toFixed(1) + ' m/s', cx, cy + 41);
+  }
+
+  /* ---------- ذرات ---------- */
+  function puff(x, y, n, col) { for (let i = 0; i < n; i++) { const a = Math.random() * TAU, s = 0.5 + Math.random() * 2; fx.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, l: 0.5 + Math.random() * 0.4, m: 0.9, c: col || '#7bb35a', r: 0.05 + Math.random() * 0.08 }); } }
+  function spark(x, y, n) { for (let i = 0; i < n; i++) { const a = Math.random() * TAU, s = 2 + Math.random() * 5; fx.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, l: 0.3 + Math.random() * 0.3, m: 0.6, c: '#ffe27a', r: 0.05, glow: 1 }); } }
+  function drawFx(dt) { for (let i = fx.length - 1; i >= 0; i--) { const p = fx[i]; p.l -= dt; if (p.l <= 0) { fx.splice(i, 1); continue; } p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.94; p.vy *= 0.94;
+    ctx.globalAlpha = Math.min(1, p.l / p.m * 1.4); ctx.fillStyle = p.c; if (p.glow) { ctx.shadowColor = '#ffd23f'; ctx.shadowBlur = 8; } ctx.beginPath(); ctx.arc(sx(p.x), sy(p.y), p.r * sc * (p.glow ? 1 : (1.2 - p.l / p.m * 0.4)), 0, TAU); ctx.fill(); ctx.shadowBlur = 0; } ctx.globalAlpha = 1; }
+  function weather(dt, w) {
+    if (!V.weather) return; ctx.lineCap = 'round';
+    for (const p of parts) {
+      if (V.weather === 'rain') { p.y += dt * (1.7 + p.s); p.x += dt * (w.x * 0.02 + 0.03); if (p.y > 1) { p.y = -0.05; p.x = Math.random(); } if (p.x > 1) p.x -= 1;
+        ctx.strokeStyle = `rgba(190,215,255,${0.25 + p.s * 0.25})`; ctx.lineWidth = 1 + p.s * 0.6; ctx.beginPath(); ctx.moveTo(p.x * W, p.y * H); ctx.lineTo(p.x * W + w.x * 1.6 + 2, p.y * H + 14 * p.s + 6); ctx.stroke(); }
+      else { p.y += dt * 0.1 * p.s; p.x += dt * (w.x * 0.01 + Math.sin(p.y * 14 + p.s * 6) * 0.012); if (p.y > 1) { p.y = -0.02; p.x = Math.random(); } if (p.x > 1) p.x -= 1; if (p.x < 0) p.x += 1;
+        ctx.fillStyle = `rgba(255,255,255,${0.6 + p.s * 0.3})`; ctx.beginPath(); ctx.arc(p.x * W, p.y * H, 1 + p.s * 1.7, 0, TAU); ctx.fill(); }
+    }
+    if (envId === 'rain') { if (Math.random() < 0.0025) flash = 1; if (flash > 0) { ctx.fillStyle = `rgba(225,238,255,${flash * 0.38})`; ctx.fillRect(0, 0, W, H); flash -= dt * 2.2; } }
+  }
+  function ripples(dt) { if (envId !== 'rain') return; for (let i = 0; i < 3; i++) rips.push({ x: (Math.random() - 0.5) * 12, y: yTop + 4 + Math.random() * (H / sc - 4), l: 0.5 });
+    for (let i = rips.length - 1; i >= 0; i--) { const r = rips[i]; r.l -= dt; if (r.l <= 0) { rips.splice(i, 1); continue; } const k = 1 - r.l / 0.5; ctx.strokeStyle = `rgba(200,225,255,${0.5 * (1 - k)})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(sx(r.x), sy(r.y), (3 + k * 8), (1.5 + k * 3.5), 0, 0, TAU); ctx.stroke(); } }
+  function confetti(n) { for (let i = 0; i < n; i++) conf.push({ x: W / 2 + (Math.random() - 0.5) * W * 0.5, y: -10 - Math.random() * 60, vx: (Math.random() - 0.5) * 220, vy: 60 + Math.random() * 260, r: Math.random() * 6, vr: Math.random() * 10 - 5, c: `hsl(${Math.random() * 360},90%,60%)`, l: 3.2, w: 4 + Math.random() * 5 }); }
+  function confDraw(dt) { for (let i = conf.length - 1; i >= 0; i--) { const p = conf[i]; p.vy += 120 * dt; p.vx += Math.sin(p.r) * 20 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.r += p.vr * dt; p.l -= dt; if (p.l <= 0) { conf.splice(i, 1); continue; }
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.scale(1, Math.abs(Math.cos(p.r * 2)) + 0.1); ctx.fillStyle = p.c; ctx.globalAlpha = Math.min(1, p.l); ctx.fillRect(-p.w / 2, -2, p.w, 4); ctx.restore(); } }
+
+  /* ---------- فریم ---------- */
+  function frame(S, dt) {
+    T += dt; cheer = Math.max(0, cheer - dt * 0.5); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); shakeAmp *= Math.pow(0.02, dt);
+    ctx.save(); if (shakeAmp > 0.3) ctx.translate((Math.random() - 0.5) * shakeAmp, (Math.random() - 0.5) * shakeAmp);
+    ctx.drawImage(pitch, 0, 0, W, H); backdrop(dt); ripples(dt);
+    const b = S.ball, inNet = b && b.cross === 'in';
+    goalBack(b); keeperDraw(S.keeper, S.kPose, S.time + 3); if (S.shooter) shooterDraw(S.shooter);
+    if (inNet) ballDraw(b, S.trail);
+    goalFront(b, S.time); if (!inNet) ballDraw(b, S.trail);
+    drawFx(dt); aimDraw(S.aim); ctx.restore();
+    if (V.lights) for (const fxp of [0.08, 0.92]) { const gr = ctx.createRadialGradient(W * fxp, 24, 2, W * fxp, 24, 70 + Math.sin(T * 3 + fxp * 9) * 6); gr.addColorStop(0, 'rgba(255,255,230,.55)'); gr.addColorStop(1, 'rgba(255,255,230,0)'); ctx.fillStyle = gr; ctx.fillRect(W * fxp - 80, 0, 160, 110); }
+    const vg = ctx.createRadialGradient(W / 2, H * 0.55, H * 0.25, W / 2, H * 0.55, H * 0.85); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, `rgba(0,0,0,${V.kind === 'arena' ? 0.5 : 0.28})`); ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+    weather(dt, S.wind || { x: 0, y: 0 }); confDraw(dt); windDraw(S.wind || { x: 0, y: 0 });
+  }
+  return { init, resize, setEnv, frame, confetti, puff, spark, shake: a => { shakeAmp = a; }, cheer: v => { cheer = v; }, get scale() { return sc; }, get pull() { return Math.min(W, H) * 0.3; }, sx, sy };
+})();
+'use strict';
+/* ========== NET: فایربیس Realtime Database (بدون Auth؛ فقط آدرس دیتابیس) ========== */
+const Net = (() => {
+  const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/', LS = 'pk_dburl', SES = 'pk_session';
+  let db, me = null, offs = [], connCb = null, started = false, authCb = null;
+  const TS = () => firebase.database.ServerValue.TIMESTAMP;
+  const URL_RE = /https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:firebaseio\.com|firebasedatabase\.app)/i;
+
+  const getUrl = () => { const c = window.FIREBASE_DB_URL; if (c && URL_RE.test(c)) return c.match(URL_RE)[0]; try { return localStorage.getItem(LS); } catch (e) { return null; } };
+  const setUrl = text => { const m = String(text).match(URL_RE); if (!m) return false; try { localStorage.setItem(LS, m[0]); } catch (e) {} return true; };
+  const clearUrl = () => { try { localStorage.removeItem(LS); } catch (e) {} };
+  const configured = () => !!getUrl();
+
+  const load = src => new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej({ code: 'sdk' }); document.head.appendChild(s); });
+  const hash = s => { let h1 = 0xdeadbeef, h2 = 0x41c6ce57; for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909); h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909); return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36); };
+  const normName = n => String(n || '').trim().toLowerCase(), okName = n => /^[a-z0-9_]{3,16}$/.test(n);
+
+  async function init(onAuth) {
+    if (started) return; const url = getUrl(); if (!url) throw { code: 'nocfg' }; authCb = onAuth;
+    if (!window.firebase) { await load(SDK + 'firebase-app-compat.js'); await load(SDK + 'firebase-database-compat.js'); }
+    const pid = (url.match(/https:\/\/([a-z0-9-]+?)(?:-default-rtdb)?\./i) || [])[1] || 'penalty';
+    firebase.initializeApp({ databaseURL: url, projectId: pid, apiKey: 'none' }); db = firebase.database(); started = true;
+    db.ref('.info/connected').on('value', s => { connCb && connCb(!!s.val()); if (s.val() && me) presence(); });
+    let ses = null; try { ses = JSON.parse(localStorage.getItem(SES)); } catch (e) {}
+    if (ses && ses.name) { try { const h = (await db.ref('creds/' + ses.name).once('value')).val(); if (h && h === ses.h) { enter(ses.name); return; } } catch (e) {} }
+    authCb(null);
+  }
+  function enter(name, h) { me = { uid: name, name }; if (h) try { localStorage.setItem(SES, JSON.stringify({ name, h })); } catch (e) {} presence(); authCb(me); }
+  function presence() { const r = db.ref('status/' + me.uid); r.onDisconnect().remove().then(() => r.set({ on: true, t: TS() })); }
+
+  function errText(e) {
+    const c = (e && (e.code || e.message)) || '';
+    if (/PERMISSION_DENIED/i.test(c + (e && e.message))) return 'دسترسی رد شد؛ Rules دیتابیس را طبق راهنما Publish کن.';
+    const m = { taken: 'این نام کاربری قبلاً گرفته شده.', bad: 'نام کاربری یا رمز اشتباه است.', weak: 'رمز باید حداقل ۴ کاراکتر باشد.', badname: 'نام کاربری: ۳ تا ۱۶ حرف انگلیسی/عدد/_',
+      sdk: 'بارگذاری فایربیس ممکن نشد (اینترنت یا فیلترشکن را بررسی کن).', nocfg: 'آدرس دیتابیس وارد نشده.' };
+    return m[c] || (/network|timeout|offline/i.test(c) ? 'اینترنت قطع است.' : 'خطا: ' + c);
+  }
+
+  async function signup(name, pass) {
+    name = normName(name); if (!okName(name)) throw { code: 'badname' }; if (String(pass).length < 4) throw { code: 'weak' };
+    const r = await db.ref('usernames/' + name).transaction(cur => cur ? undefined : true);
+    if (!r.committed) throw { code: 'taken' };
+    const h = hash(pass + ':' + name); await db.ref('creds/' + name).set(h); enter(name, h);
+  }
+  async function login(name, pass) {
+    name = normName(name); const h = (await db.ref('creds/' + name).once('value')).val();
+    if (!h || h !== hash(pass + ':' + name)) throw { code: 'bad' }; enter(name, h);
+  }
+  async function logout() { stopWatch(); if (me) { try { await db.ref('status/' + me.uid).remove(); } catch (e) {} } try { localStorage.removeItem(SES); } catch (e) {} me = null; authCb(null); }
+
+  async function search(q) {
+    q = normName(q); if (!q) return [];
+    const s = await db.ref('usernames').orderByKey().startAt(q).endAt(q + '').limitToFirst(8).once('value'), out = [];
+    s.forEach(c => { if (c.key !== me.uid) out.push({ name: c.key, uid: c.key }); }); return out;
+  }
+  const sendRequest = u => db.ref(`requests/${u.uid}/${me.uid}`).set({ name: me.name, ts: TS() });
+  async function acceptRequest(r) { await db.ref(`friends/${me.uid}/${r.uid}`).set(true); await db.ref(`friends/${r.uid}/${me.uid}`).set(true); await db.ref(`requests/${me.uid}/${r.uid}`).remove(); }
+  const declineRequest = r => db.ref(`requests/${me.uid}/${r.uid}`).remove();
+  async function removeFriend(f) { await db.ref(`friends/${me.uid}/${f.uid}`).remove(); await db.ref(`friends/${f.uid}/${me.uid}`).remove(); }
+
+  function stopWatch() { offs.forEach(f => { try { f(); } catch (e) {} }); offs = []; }
+  function watchSocial(cb) {
+    stopWatch(); const F = {}; let R = [], I = [];
+    const emit = () => cb({ friends: Object.values(F).sort((a, b) => (b.online - a.online) || a.name.localeCompare(b.name)), requests: R, invites: I });
+    const fref = db.ref('friends/' + me.uid);
+    fref.on('child_added', s => { const fid = s.key; F[fid] = { uid: fid, name: fid, online: false }; const sref = db.ref('status/' + fid), fn = sref.on('value', v => { if (F[fid]) { F[fid].online = !!v.val(); emit(); } }); F[fid].off = () => sref.off('value', fn); emit(); });
+    fref.on('child_removed', s => { if (F[s.key]) { F[s.key].off(); delete F[s.key]; emit(); } });
+    offs.push(() => { fref.off(); Object.values(F).forEach(f => f.off()); });
+    const rref = db.ref('requests/' + me.uid); rref.on('value', s => { R = []; s.forEach(c => { R.push({ uid: c.key, name: c.key }); }); emit(); }); offs.push(() => rref.off());
+    const iref = db.ref('invites/' + me.uid); iref.on('value', s => { I = []; s.forEach(c => { const v = c.val(); if (v && Date.now() - v.ts < 30 * 60000) I.push({ from: c.key, rid: v.rid, name: c.key, env: v.env }); }); emit(); }); offs.push(() => iref.off());
+  }
+
+  async function createRoom(friend, env) {
+    const ref = db.ref('rooms').push(), rid = ref.key, seed = (Math.random() * 1e9) | 0;
+    await ref.set({ host: me.uid, guest: friend.uid, hn: me.name, gn: friend.name, env, seed, ts: TS() });
+    await db.ref(`invites/${friend.uid}/${me.uid}`).set({ rid, env, ts: Date.now() }); return { rid, seed };
+  }
+  const dropInvite = from => db.ref(`invites/${me.uid}/${from}`).remove();
+  const cancelInvite = friendUid => db.ref(`invites/${friendUid}/${me.uid}`).remove();
+  const getRoom = async rid => (await db.ref('rooms/' + rid).once('value')).val();
+
+  function openRoom(rid, h) {
+    const base = db.ref('rooms/' + rid), f = [];
+    const on = (path, ev, fn) => { const r = base.child(path), w = r.on(ev, fn); f.push(() => r.off(ev, w)); };
+    on('ev', 'child_added', s => h.onEvent && h.onEvent(s.val()));
+    on('k', 'value', s => { const v = s.val(); if (v && v.u !== me.uid && h.onKeeper) h.onKeeper(v); });
+    on('join', 'child_added', s => h.onJoin && h.onJoin(s.key));
+    on('left', 'child_added', s => { if (s.key !== me.uid && h.onLeft) h.onLeft(s.key); });
+    let last = 0;
+    return {
+      send: e => base.child('ev').push(Object.assign({ u: me.uid }, e)),
+      keeper(k, force) { const n = performance.now(); if (!force && n - last < 55) return; last = n;
+        base.child('k').set({ u: me.uid, x: +k.x.toFixed(2), y: +k.y.toFixed(2), d: k.dive > 0 ? 1 : 0, dx: +(k.dvx || 0).toFixed(2), dy: +(k.dvy || 0).toFixed(2), r: k.rec > 0 ? 1 : 0 }); },
+      join() { base.child('join/' + me.uid).set(true); base.child('left/' + me.uid).onDisconnect().set(true); },
+      async leave(removeRoom) { f.forEach(x => x()); try { await base.child('left/' + me.uid).set(true); if (removeRoom) await base.remove(); } catch (e) {} },
+      close() { f.forEach(x => x()); }
+    };
+  }
+
+  return { configured, getUrl, setUrl, clearUrl, init, errText, signup, login, logout, search, sendRequest, acceptRequest, declineRequest, removeFriend, watchSocial, stopWatch,
+    createRoom, dropInvite, cancelInvite, getRoom, openRoom, onConn: f => { connCb = f; }, get me() { return me; }, okName, normName };
+})();
+</script><script>
+'use strict';
+/* ========== GAME: کنترل بازی، ورودی‌ها، صدا، آنلاین ========== */
+const $ = id => document.getElementById(id);
+
+const Snd = (() => {
+  let ac, on = true;
+  const ctx = () => ac || (ac = new (window.AudioContext || window.webkitAudioContext)());
+  function tone(f0, f1, d, type = 'sine', vol = 0.3) { if (!on) return; try { const c = ctx(), o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, c.currentTime); o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), c.currentTime + d);
+    g.gain.setValueAtTime(vol, c.currentTime); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + d); o.connect(g).connect(c.destination); o.start(); o.stop(c.currentTime + d); } catch (e) {} }
+  function noise(d, vol, f) { if (!on) return; try { const c = ctx(), n = c.sampleRate * d, buf = c.createBuffer(1, n, c.sampleRate), a = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) a[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 1.3);
+    const s = c.createBufferSource(), fl = c.createBiquadFilter(), g = c.createGain(); fl.type = 'bandpass'; fl.frequency.value = f; g.gain.value = vol; s.buffer = buf; s.connect(fl).connect(g).connect(c.destination); s.start(); } catch (e) {} }
+  return { get on() { return on; }, set on(v) { on = v; }, unlock() { try { ctx().resume(); } catch (e) {} },
+    amb: null,
+    ambient(env) { this.stopAmbient(); if (!on) return; try { const c = ctx(), n = c.sampleRate * 2, buf = c.createBuffer(1, n, c.sampleRate), a = buf.getChannelData(0); let l = 0;
+      for (let i = 0; i < n; i++) { l = l * 0.97 + (Math.random() * 2 - 1) * 0.3; a[i] = l; } const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+      const P = { stadium: ['bandpass', 450, 0.55], rain: ['highpass', 2500, 0.16], beach: ['lowpass', 700, 0.5], snow: ['lowpass', 350, 0.4], futsal: ['bandpass', 700, 0.5], mars: ['lowpass', 220, 0.45] }[env] || ['bandpass', 500, 0.4];
+      f.type = P[0]; f.frequency.value = P[1]; g.gain.value = P[2] * 0.22; src.buffer = buf; src.loop = true; src.connect(f).connect(g).connect(c.destination); src.start(); this.amb = { src, g, base: P[2] * 0.22 }; } catch (e) {} },
+    stopAmbient() { if (this.amb) { try { this.amb.src.stop(); } catch (e) {} this.amb = null; } },
+    roar(x) { if (!this.amb) return; try { const g = this.amb.g.gain, t = ctx().currentTime; g.cancelScheduledValues(t); g.setValueAtTime(this.amb.base, t); g.linearRampToValueAtTime(this.amb.base * (1 + x * 3), t + 0.25); g.linearRampToValueAtTime(this.amb.base, t + 2.6); } catch (e) {} },
+    bounce: s => tone(220, 90, 0.07, 'sine', Math.min(0.3, 0.05 * s)), net: () => noise(0.25, 0.25, 2200),
+    kick: p => { tone(160, 45, 0.14, 'sine', 0.5); noise(0.08, 0.2 + p * 0.3, 900); },
+    goal: () => { noise(1.6, 0.5, 1200); tone(520, 780, 0.4, 'triangle', 0.15); }, save: () => { tone(110, 60, 0.18, 'square', 0.25); noise(0.15, 0.3, 500); },
+    post: () => { tone(1500, 900, 0.5, 'triangle', 0.35); tone(300, 200, 0.2, 'sine', 0.3); }, miss: () => noise(0.7, 0.18, 400),
+    whistle: () => { tone(2800, 2600, 0.35, 'square', 0.12); }, win: () => { [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => tone(f, f, 0.25, 'triangle', 0.25), i * 140)); } };
+})();
+
+const Game = (() => {
+  const C = Core, HF = C.HALF, SPOT = C.SPOT, H = 1 / 120;
+  let G = null, last = 0, running = false;
+  const keys = {}, stick = { on: false, id: null, ox: 0, oy: 0, x: 0, y: 0 }, drag = { on: false, id: null };
+  const lv = () => C.LEVELS[G.level]; const PUFF = { stadium: '#7bb35a', rain: '#8fb9d8', beach: '#e8d098', snow: '#ffffff', futsal: '#e5e5e5', mars: '#d98a60' };
+
+  function toast(t, ms = 1800) { const e = $('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms); }
+  function banner(t, col) { const e = $('banner'); e.textContent = t; e.style.color = col; e.classList.remove('on'); void e.offsetWidth; e.classList.add('on'); }
+
+  /* ---------- شروع / پایان ---------- */
+  function start(o) {
+    stop(true);
+    G = Object.assign({ mode: 'bot', level: 1, me: 0, kick: 0, matchNo: 0, phase: 'idle', pending: {}, again: {}, rk: null, over: false, time: 0, acc: 0, trail: [], K: C.createKeeper() }, o);
+    G.env = C.ENVS[o.env]; G.match = new C.Match(); G.rng = C.rng(o.seed || (Math.random() * 1e9) | 0); G.seed = o.seed || 1;
+    Render.setEnv(o.env); Render.resize();
+    ['sMenu', 'sBot', 'sOnline', 'sWait', 'sOver', 'sHelp'].forEach(i => $(i).classList.remove('on'));
+    $('hud').classList.add('on'); $('exitBtn').classList.add('on'); const tag = G.mode === 'online' ? ' ⭐' : ''; $('n0').textContent = G.names[0] + (G.me === 0 ? tag : ''); $('n1').textContent = G.names[1] + (G.me === 1 ? tag : '');
+    G.stats = { shots: [0, 0], goals: [0, 0], saves: [0, 0], top: [0, 0] }; Snd.ambient(o.env); Snd.whistle(); startKick();
+    if (!running) { running = true; last = performance.now(); requestAnimationFrame(loop); }
+  }
+  function stop(silent) {
+    if (G && G.room) { G.room.leave(G.mode === 'online' && !silent); G.room = null; }
+    Snd.stopAmbient(); G = null; $('hud').classList.remove('on'); $('exitBtn').classList.remove('on'); $('ctl').classList.remove('on');
+    $('stick').style.display = 'none'; $('diveBtn').classList.remove('on'); $('kHint').style.display = 'none';
+  }
+
+  function startKick() {
+    G.phase = 'aim'; G.ball = null; G.trail = []; G.K = C.createKeeper(); G.shot = null; G.rk = G.rk && G.rk.fresh ? null : G.rk;
+    G.isShooter = (G.kick % 2) === G.me; G.wind = C.windFor(G.env, G.seed, G.kick); G.shotSeed = Math.random(); G.aim = null; G.sh = { x: -1.5, y: SPOT + 2.3, pose: 'idle', run: 0, k: 0, t: 0, kit: (G.kick % 2) ? 'red' : 'blue', num: (G.kick % 2) ? 7 : 10 }; G.kPose = 'ready'; G.runT = 0; G.slowT = 0;
+    G.botK = null; G.resolved = false; G.nextT = 0; G.waitT = 0; G.diveReq = false;
+    if (G.mode === 'bot') { if (G.isShooter) G.botK = new C.BotKeeper(G.level, G.rng); else G.aimT = 1.3 + G.rng() * 1.0; }
+    $('ctl').classList.toggle('on', G.isShooter); $('diveBtn').classList.toggle('on', !G.isShooter);
+    $('kHint').style.display = !G.isShooter && G.kick < 3 ? 'block' : 'none';
+    updateHud();
+    toast(G.isShooter ? '🎯 نوبت توئه! بکش، هدف بگیر و رها کن' : '🧤 دروازه‌بان باش! انگشتت را بکش', 2200);
+    if (G.pending[G.kick]) { const p = G.pending[G.kick]; delete G.pending[G.kick]; doShot(p, false); }
+  }
+
+  /* ---------- ضربه ---------- */
+  function doShot(shot, local) {
+    if (!G || G.phase !== 'aim') return;
+    G.shot = shot; G.phase = 'runup'; G.runT = 0; G.aim = null; drag.on = false; $('ctl').classList.remove('on'); $('kHint').style.display = 'none';
+    if (G.mode === 'online' && local) G.room.send({ t: 'shot', m: G.matchNo, k: G.kick, ang: shot.ang, pow: shot.pow, spin: shot.spin, loft: shot.loft, seed: shot.seed });
+  }
+  function launchBall() {
+    const shot = G.shot; G.ball = C.launch(shot, G.env, G.wind); G.phase = 'flight'; G.sh.pose = 'kick'; G.sh.k = 0; Snd.kick(shot.pow); navigator.vibrate && navigator.vibrate(25);
+    const sp = Math.hypot(G.ball.vx, G.ball.vy, G.ball.vz) * 3.6, side = G.kick % 2; G.stats.shots[side]++; G.stats.top[side] = Math.max(G.stats.top[side], sp);
+    const e = $('speed'); e.textContent = Math.round(sp) + ' km/h'; e.classList.remove('on'); void e.offsetWidth; e.classList.add('on');
+    Render.puff(0, SPOT, 5, PUFF[G.env.id]);
+    if (G.botK) G.botK.start(shot, G.env, G.wind);
+  }
+  function currentShot(ang, pow) { return { ang, pow, spin: +$('spin').value / 100, loft: +$('loft').value / 100, seed: G.shotSeed }; }
+  function preview(shot) {
+    const b = C.launch(shot, G.env, G.wind), k = C.createKeeper(); k.x = 99; const pts = []; let i = 0;
+    while (b.t < 1.6 && b.y > -0.4) { C.stepBall(b, k, H, G.env); if (i++ % 3 === 0) pts.push({ x: b.x, y: b.y, z: b.z }); }
+    return pts;
+  }
+  function updateAim(px, py) {
+    const vx = drag.ax - px, vy = drag.ay - py, len = Math.hypot(vx, vy), max = Render.pull, k = len > max ? max / len : 1;
+    let pow = Math.min(1, len / max); const ang = Math.max(-1.15, Math.min(1.15, Math.atan2(vx, -vy)));
+    if (vy > -4) pow = 0; // باید به سمت پایین بکشی
+    G.aim = { on: true, from: { x: drag.ax, y: drag.ay }, to: { x: drag.ax - vx * k, y: drag.ay - vy * k }, pow, ang, preview: pow > 0.05 ? preview(currentShot(ang, pow)) : [] };
+  }
+  function releaseAim() {
+    if (!G || !G.aim) return; const a = G.aim; G.aim = null;
+    if (a.pow >= 0.12) doShot(currentShot(a.ang, a.pow), true); else toast('بیشتر بکش!', 900);
+  }
+
+  /* ---------- ورودی دروازه‌بان ---------- */
+  function humanInput() {
+    let x = stick.on ? stick.x : 0, y = stick.on ? stick.y : 0;
+    if (!stick.on) { x = (keys.ArrowRight || keys.d ? 1 : 0) - (keys.ArrowLeft || keys.a ? 1 : 0); y = (keys.ArrowDown || keys.s ? 1 : 0) - (keys.ArrowUp || keys.w ? 1 : 0); }
+    const dive = G.diveReq; G.diveReq = false;
+    return { x, y, dive, dx: G.ball ? Math.sign(G.ball.x - G.K.x) || 1 : (G.K.dir || 1) };
+  }
+
+  /* ---------- نتیجه ---------- */
+  function resolve() {
+    G.resolved = true;
+    if (G.mode === 'online') G.room.send({ t: 'res', m: G.matchNo, k: G.kick, r: G.ball.result, p: G.ball.post ? 1 : 0 });
+    else onResult(G.ball.result, G.ball.post);
+  }
+  function onResult(r, post) {
+    if (!G || G.phase === 'result' || G.phase === 'over') return;
+    G.phase = 'result'; G.match.push(r === 'goal'); G.nextT = 2.6; updateHud();
+    const side = G.kick % 2; if (r === 'goal') G.stats.goals[side]++; if (r === 'save') G.stats.saves[1 - side]++;
+    G.sh.pose = r === 'goal' ? 'cheer' : 'sad'; G.kPose = r === 'save' ? 'cheer' : r === 'goal' ? 'sad' : 'ready'; G.slowT = r === 'goal' ? 1.1 : 0.7;
+    Render.cheer(r === 'goal' ? 3 : 1); Snd.roar(r === 'goal' ? 1 : 0.4);
+    const mine = (G.kick % 2) === G.me;
+    if (r === 'goal') { banner('⚽ گووول!', '#2fd27a'); Snd.goal(); if (mine) Render.confetti(110); }
+    else if (r === 'save') { banner('🧤 مهار شد!', '#ffd23f'); Snd.save(); }
+    else if (post) { banner('تیرک!', '#ff9f43'); Snd.post(); Render.shake(14); }
+    else { banner('اوت!', '#ff5a5f'); Snd.miss(); }
+    navigator.vibrate && navigator.vibrate(r === 'goal' ? [40, 40, 80] : 40);
+  }
+  function nextStep() {
+    const st = G.match.stats; if (st.over) return endGame(st);
+    G.kick++; startKick(); Snd.whistle();
+  }
+  function endGame(st) {
+    G.phase = 'over'; G.over = true; $('ctl').classList.remove('on'); $('diveBtn').classList.remove('on'); $('kHint').style.display = 'none';
+    const win = st.winner === G.me; $('ovT').textContent = win ? '🏆 برنده شدی!' : '😞 باختی'; $('ovT').style.color = win ? '#ffd23f' : '#ff5a5f';
+    $('ovS').textContent = `${G.names[0]} ${st.s[0]} : ${st.s[1]} ${G.names[1]}` + (st.sudden ? ' (ضربات تعیین‌کننده)' : '');
+    const S = G.stats; $('ovH').innerHTML = `<div class="stat"><b>${S.shots[0]}</b><span>شوت</span><b>${S.shots[1]}</b></div><div class="stat"><b>${S.saves[0]}</b><span>مهار</span><b>${S.saves[1]}</b></div><div class="stat"><b>${Math.round(S.top[0])}</b><span>سریع‌ترین (km/h)</span><b>${Math.round(S.top[1])}</b></div>` + (G.mode === 'online' ? '<div style="margin-top:8px">برای بازی دوباره هر دو نفر باید دکمه را بزنید.</div>' : '');
+    $('bAgain').disabled = false; $('bAgain').textContent = '🔁 بازی دوباره'; $('sOver').classList.add('on');
+    if (win) { Snd.win(); Render.confetti(220); }
+  }
+  function oppLeft() {
+    if (!G || G.over) return; G.over = true; G.phase = 'over'; $('ctl').classList.remove('on'); $('diveBtn').classList.remove('on');
+    $('ovT').textContent = 'حریف خارج شد'; $('ovT').style.color = '#ff9f43'; $('ovS').textContent = ''; $('ovH').textContent = ''; $('bAgain').disabled = true; $('sOver').classList.add('on');
+  }
+  function again() {
+    if (G.mode === 'bot') { const o = { mode: 'bot', env: G.env.id, level: G.level, me: 0, names: G.names }; start(o); return; }
+    $('bAgain').disabled = true; $('bAgain').textContent = 'منتظر حریف…'; G.room.send({ t: 'again', m: G.matchNo });
+  }
+
+  /* ---------- آنلاین ---------- */
+  function onEvent(e) {
+    if (!G || e.m !== G.matchNo) return;
+    if (e.t === 'shot') { if (e.u === Net.me.uid) return; if (e.k === G.kick && G.phase === 'aim') doShot(e, false); else if (e.k > G.kick) G.pending[e.k] = e; }
+    else if (e.t === 'res') { if (e.k === G.kick && G.phase === 'flight') onResult(e.r, !!e.p); }
+    else if (e.t === 'again') { G.again[e.u] = 1; if (Object.keys(G.again).length >= 2) { const o = G.opts; G.matchNo++; G.again = {}; G.match = new C.Match(); G.kick = 0; G.over = false; $('sOver').classList.remove('on'); startKick(); } }
+  }
+  function startOnline(meta, side, room, h) {
+    const o = { mode: 'online', env: meta.env, me: side, names: [meta.hn, meta.gn], seed: meta.seed, level: 1 };
+    start(o); G.room = room; G.opts = o; h.onEvent = onEvent; h.onKeeper = k => { if (G) { k.fresh = 1; G.rk = k; } };
+    h.onLeft = () => oppLeft();
+  }
+
+  /* ---------- HUD ---------- */
+  function updateHud() {
+    const st = G.match.stats, dots = [[], []];
+    G.match.kicks.forEach((g, i) => dots[i % 2].push(g));
+    for (const s of [0, 1]) { const n = Math.max(5, dots[s].length + (G.phase === 'aim' && (G.kick % 2) === s && dots[s].length >= 5 ? 1 : 0));
+      $('d' + s).innerHTML = Array.from({ length: n }, (_, i) => `<i class="${dots[s][i] === undefined ? '' : dots[s][i] ? 'g' : 'm'}"></i>`).join(''); }
+    $('s0').textContent = st.s[0]; $('s1').textContent = st.s[1];
+    $('t0').classList.toggle('act', (G.kick % 2) === 0); $('t1').classList.toggle('act', (G.kick % 2) === 1);
+    $('info').textContent = `${G.env.name} · ${G.mode === 'bot' ? 'ربات ' + lv().name : 'آنلاین'}${st.sudden ? ' · ضربات تعیین‌کننده' : ''}`;
+  }
+
+  /* ---------- حلقه ---------- */
+  function loop(now) {
+    requestAnimationFrame(loop);
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (!G) { Render.frame({ keeper: C.createKeeper(), ball: null, time: 0, wind: { x: 0, y: 0 } }, dt); return; }
+    G.time += dt; G.sh.t += dt; const ts = G.slowT > 0 ? 0.33 : 1; G.slowT -= dt; G.acc += dt * ts;
+    if (G.phase === 'runup') { G.runT += dt; const u = Math.min(1, G.runT / 0.34), e = u * u * (3 - 2 * u); G.sh.pose = 'run'; G.sh.run += dt; G.sh.x = -1.5 + 1.08 * e; G.sh.y = SPOT + 2.3 - 1.8 * e; if (u >= 1) launchBall(); }
+    else if (G.sh.pose === 'kick') { G.sh.k += dt * 3.5; if (G.sh.k >= 1) { G.sh.pose = 'idle'; } }
+    if (G.mode === 'bot' && G.phase === 'aim' && !G.isShooter) { G.aimT -= dt; if (G.aimT <= 0) doShot(C.botShot(G.level, G.env, G.wind, G.rng, G.rng()), false); }
+    const remoteK = G.mode === 'online' && G.isShooter;
+    if (remoteK && G.rk) { const r = G.rk, k = G.K, f = Math.min(1, 14 * dt); k.x += (r.x - k.x) * f; k.y += (r.y - k.y) * f; k.dive = r.d ? 0.2 : 0; k.rec = r.r ? 0.3 : 0; k.dvx = r.dx; k.dvy = r.dy; }
+    let n = 0;
+    while (G.acc >= H && n++ < 14) {
+      G.acc -= H;
+      if (!remoteK && G.phase !== 'over') {
+        const inp = !G.isShooter ? humanInput() : G.botK ? G.botK.update(G.K, H) : { x: 0, y: 0 };
+        C.keeperStep(G.K, inp, H, G.botK ? lv().spd : 1);
+      }
+      if (G.ball && !G.ball.done) {
+        C.stepBall(G.ball, G.K, H, G.env);
+        if (n % 2 === 0) { G.trail.push({ x: G.ball.x, y: G.ball.y }); if (G.trail.length > 26) G.trail.shift(); }
+        while (G.ball.fx.length) { const e = G.ball.fx.shift();
+          if (e.t === 'bounce') { Render.puff(e.x, e.y, 4, PUFF[G.env.id]); Snd.bounce(e.s); } else if (e.t === 'post') { Render.spark(e.x, e.y, 16); Render.shake(12); Snd.post(); Render.cheer(1); Snd.roar(0.5); }
+          else if (e.t === 'net') Snd.net(); else if (e.t === 'save') { Render.spark(e.x, e.y, 8); Render.shake(5); } }
+        if (G.ball.result && !G.resolved && !remoteK) resolve();
+      }
+    }
+    if (remoteK && G.phase === 'flight' && G.ball && G.ball.done) { G.waitT += dt; if (G.waitT > 2.5) onResult(G.ball.result, G.ball.post); } // اگر پیام نیامد
+    if (G.mode === 'online' && !G.isShooter && G.phase !== 'over') { G.room.keeper(G.K, G.K.dive > 0 !== G.lastDive); G.lastDive = G.K.dive > 0; }
+    if (G.phase === 'result') { G.nextT -= dt; if (G.nextT <= 0) nextStep(); }
+    Render.frame({ ball: G.ball, keeper: G.K, kPose: G.kPose, shooter: G.sh, aim: G.aim, wind: G.wind, trail: G.trail, time: G.ball ? G.ball.t : G.time }, dt);
+  }
+
+  /* ---------- رویدادهای ورودی ---------- */
+  const cv = () => $('cv');
+  function bindInput() {
+    const c = cv();
+    c.addEventListener('pointerdown', e => {
+      Snd.unlock(); if (!G || G.phase === 'over') return;
+      if (G.isShooter && G.phase === 'aim' && !drag.on) { drag.on = true; drag.id = e.pointerId; drag.ax = e.clientX; drag.ay = e.clientY; updateAim(e.clientX, e.clientY); c.setPointerCapture(e.pointerId); }
+      else if (!G.isShooter && !stick.on) { Object.assign(stick, { on: true, id: e.pointerId, ox: e.clientX, oy: e.clientY, x: 0, y: 0 }); const s = $('stick'); s.style.display = 'block'; s.style.left = e.clientX + 'px'; s.style.top = e.clientY + 'px'; $('knob').style.transform = ''; c.setPointerCapture(e.pointerId); }
+    });
+    c.addEventListener('pointermove', e => {
+      if (drag.on && e.pointerId === drag.id && G && G.phase === 'aim') updateAim(e.clientX, e.clientY);
+      if (stick.on && e.pointerId === stick.id) { let dx = e.clientX - stick.ox, dy = e.clientY - stick.oy; const m = Math.hypot(dx, dy), R = 60; if (m > R) { dx *= R / m; dy *= R / m; }
+        stick.x = dx / R; stick.y = dy / R; $('knob').style.transform = `translate(${dx}px,${dy}px)`; }
+    });
+    const up = e => {
+      if (drag.on && e.pointerId === drag.id) { drag.on = false; releaseAim(); }
+      if (stick.on && e.pointerId === stick.id) { stick.on = false; stick.x = stick.y = 0; $('stick').style.display = 'none'; }
+    };
+    c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
+    const dive = e => { e.preventDefault(); if (G) G.diveReq = true; }; $('diveBtn').addEventListener('pointerdown', dive);
+    addEventListener('keydown', e => { keys[e.key] = true; keys[e.key.toLowerCase()] = true; if (e.code === 'Space' && G) { G.diveReq = true; e.preventDefault(); } });
+    addEventListener('keyup', e => { keys[e.key] = false; keys[e.key.toLowerCase()] = false; });
+    $('exitBtn').onclick = () => { if (confirm('از بازی خارج می‌شوی؟')) { stop(); UI.show('sMenu'); } };
+    $('loft').oninput = () => { if (G && G.aim) updateAim(G.aim.to.x, G.aim.to.y); }; $('spin').oninput = $('loft').oninput;
+    $('spin').ondblclick = () => { $('spin').value = 0; };
+    $('bAgain').onclick = () => again(); $('bToMenu').onclick = () => { stop(); UI.show('sMenu'); };
+  }
+  return { start, startOnline, stop, bindInput, get active() { return !!G; } };
+})();
+'use strict';
+/* ========== UI: منوها، حساب کاربری، دوستان، دعوت ========== */
+const UI = (() => {
+  const SCREENS = ['sMenu', 'sHelp', 'sBot', 'sOnline', 'sWait', 'sOver'];
+  const EMO = { stadium: '🏟', rain: '⛈', beach: '🏖', snow: '❄️', futsal: '🥅', mars: '🪐' };
+  const LVSUB = ['برای شروع', 'کمی چالش', 'جدی', 'خیلی سخت', '🔥 شانس نداری'];
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const ls = (k, d) => { try { return localStorage.getItem(k) ?? d; } catch (e) { return d; } };
+  const lset = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const sel = { level: +ls('pk_lv', 1), env: ls('pk_env', 'stadium'), inv: ls('pk_inv', 'stadium') };
+  let st = { view: 'init', err: '', social: { friends: [], requests: [], invites: [] }, results: null, sent: {}, q: '', au: '', conn: true, msg: '' };
+  let inited = false, room = null, seenInv = {};
+
+  function show(id) { SCREENS.forEach(s => $(s).classList.toggle('on', s === id)); if (id === 'sOnline') openOnline(); if (id === 'sMenu') badge(); }
+  function badge() { const n = st.social.invites.length + st.social.requests.length; $('bOnline').innerHTML = '🌐 بازی آنلاین با دوستان' + (n ? ` <span class="badge">${n}</span>` : ''); }
+
+  /* ---------- بازی با ربات ---------- */
+  function buildBot() {
+    $('lvChips').innerHTML = Core.LEVELS.map(l => `<div class="chip ${l.id === sel.level ? 'on' : ''}" data-lv="${l.id}">${l.name}<small>${LVSUB[l.id]}</small></div>`).join('');
+    $('envChips').innerHTML = Object.values(Core.ENVS).map(e => `<div class="chip ${e.id === sel.env ? 'on' : ''}" data-env="${e.id}">${EMO[e.id]} ${e.name}</div>`).join('');
+  }
+
+  /* ---------- آنلاین ---------- */
+  async function openOnline() {
+    if (!Net.configured()) { st.view = 'nocfg'; return render(); }
+    if (!inited) { st.view = 'loading'; render(); try { await initNet(); } catch (e) { st.view = 'err'; st.err = Net.errText(e); return render(); } }
+    render();
+  }
+  async function initNet() { await Net.init(onAuth); inited = true; Net.onConn(c => { st.conn = c; if ($('sOnline').classList.contains('on')) render(); }); }
+  function onAuth(me) {
+    if (me) { st.view = 'lobby'; Net.watchSocial(s => { s.invites.forEach(i => { if (!seenInv[i.rid]) { seenInv[i.rid] = 1; toastTop(`📩 ${i.name} تو را به بازی دعوت کرد`); } }); st.social = s; badge(); if ($('sOnline').classList.contains('on')) render(); }); }
+    else { st.view = 'auth'; Net.stopWatch(); st.social = { friends: [], requests: [], invites: [] }; }
+    if ($('sOnline').classList.contains('on')) render();
+  }
+  function toastTop(t) { const e = $('toast'); e.textContent = t; e.classList.add('on'); setTimeout(() => e.classList.remove('on'), 3500); }
+
+  function snap() { const g = id => $(id) && $(id).value; if (g('q') !== null && g('q') !== undefined) st.q = g('q'); if (g('au')) st.au = g('au'); if (g('invEnv')) { sel.inv = g('invEnv'); lset('pk_inv', sel.inv); } }
+  function render() {
+    snap(); const p = $('onlinePanel'), back = '<button class="btn" data-go="sMenu">بازگشت</button>';
+    if (st.view === 'loading' || st.view === 'init') { p.innerHTML = `<h2>🌐 آنلاین</h2><div class="sub">در حال اتصال…</div>${back}`; return; }
+    if (st.view === 'nocfg') {
+      p.innerHTML = `<h2>🌐 اتصال به فایربیس</h2><div class="hint">فقط <b>آدرس دیتابیس</b> لازم است (مثل <span dir="ltr">https://اسم-default-rtdb.firebaseio.com</span>). طبق راهنما بسازش و اینجا Paste کن.</div>
+      <input id="cfgText" dir="ltr" placeholder="https://....firebaseio.com" autocapitalize="off">
+      <div class="err">${esc(st.err)}</div><button class="btn p" data-act="cfgsave">ذخیره و اتصال</button>${back}`; return;
+    }
+    if (st.view === 'err') { p.innerHTML = `<h2>🌐 آنلاین</h2><div class="err">${esc(st.err)}</div><button class="btn p" data-act="retry">تلاش دوباره</button><button class="btn" data-act="cfgreset">تغییر آدرس دیتابیس</button>${back}`; return; }
+    if (st.view === 'auth') {
+      p.innerHTML = `<h2>🌐 ورود / ساخت حساب</h2><div class="hint">یک نام کاربری انگلیسی (۳ تا ۱۶ حرف/عدد/_) و رمز بگذار. دوستت با همین نام تو را پیدا می‌کند.</div>
+      <input id="au" placeholder="نام کاربری (مثلاً ali_10)" autocapitalize="off" autocomplete="username" value="${esc(st.au)}" dir="ltr">
+      <input id="ap" type="password" placeholder="رمز (حداقل ۴ کاراکتر)" autocomplete="current-password" dir="ltr">
+      <div class="err">${esc(st.err)}</div>
+      <div class="row"><button class="btn p" data-act="login">ورود</button><button class="btn g" data-act="signup">ساخت حساب</button></div>
+      <button class="btn s" data-act="cfgreset">تغییر آدرس دیتابیس</button>${back}`; return;
+    }
+    const me = Net.me, S = st.social, fr = S.friends.map(f => `<div class="item"><span class="dot ${f.online ? 'on' : ''}"></span><b>${esc(f.name)}</b>
+      ${f.online ? `<button class="btn s g" data-act="invite" data-uid="${f.uid}" data-name="${esc(f.name)}">دعوت به بازی</button>` : '<span class="hint">آفلاین</span>'}
+      <button class="btn s" data-act="unfriend" data-uid="${f.uid}" data-name="${esc(f.name)}">✕</button></div>`).join('') || '<div class="hint">هنوز دوستی نداری؛ پایین‌تر جستجو کن.</div>';
+    const isF = u => S.friends.some(f => f.uid === u);
+    const res = st.results == null ? '' : (st.results.map(r => `<div class="item"><b>${esc(r.name)}</b>${isF(r.uid) ? '<span class="hint">دوست شما</span>' : st.sent[r.uid] ? '<span class="hint">ارسال شد ✓</span>' : `<button class="btn s p" data-act="add" data-uid="${r.uid}" data-name="${esc(r.name)}">+ درخواست دوستی</button>`}</div>`).join('') || '<div class="hint">کاربری پیدا نشد.</div>');
+    p.innerHTML = `<div class="row" style="flex:none"><div class="item" style="flex:1"><span class="dot ${st.conn ? 'on' : ''}"></span><b>${esc(me.name)}</b><span class="hint">${st.conn ? 'متصل' : 'قطع'}</span></div><button class="btn s" data-act="logout" style="flex:none">خروج</button></div>
+      ${S.invites.length ? `<h3>📩 دعوت به بازی</h3>` + S.invites.map(i => `<div class="item"><b>${esc(i.name)}</b><span class="hint">${esc((Core.ENVS[i.env] || {}).name || '')}</span><button class="btn s g" data-act="join" data-rid="${i.rid}" data-from="${i.from}">قبول</button><button class="btn s" data-act="nojoin" data-from="${i.from}">✕</button></div>`).join('') : ''}
+      ${S.requests.length ? `<h3>🤝 درخواست دوستی</h3>` + S.requests.map(r => `<div class="item"><b>${esc(r.name)}</b><button class="btn s g" data-act="accept" data-uid="${r.uid}">قبول</button><button class="btn s" data-act="decline" data-uid="${r.uid}">✕</button></div>`).join('') : ''}
+      <h3>👥 دوستان (${S.friends.length}) — محیط بازی:</h3>
+      <select id="invEnv">${Object.values(Core.ENVS).map(e => `<option value="${e.id}" ${e.id === sel.inv ? 'selected' : ''}>${EMO[e.id]} ${e.name}</option>`).join('')}</select>
+      <div class="col" style="gap:6px">${fr}</div>
+      <h3>🔎 پیدا کردن دوست با نام کاربری</h3>
+      <div class="row"><input id="q" placeholder="نام کاربری دوستت" autocapitalize="off" dir="ltr" value="${esc(st.q)}"><button class="btn p" data-act="search" style="flex:none">جستجو</button></div>
+      <div class="col" style="gap:6px">${res}</div><div class="err">${esc(st.msg)}</div>${back}`;
+  }
+
+  async function act(el) {
+    const a = el.dataset.act, d = el.dataset; st.err = ''; st.msg = '';
+    try {
+      if (a === 'cfgsave') { if (!Net.setUrl($('cfgText').value)) { st.err = 'آدرس معتبر نیست؛ باید چیزی شبیه https://…firebaseio.com یا …firebasedatabase.app باشد.'; return render(); } st.view = 'loading'; render(); await initNet(); return render(); }
+      if (a === 'cfgreset') { Net.clearUrl(); st.view = 'nocfg'; return render(); }
+      if (a === 'retry') { st.view = 'loading'; render(); await initNet(); return render(); }
+      if (a === 'login' || a === 'signup') { const u = $('au').value, pw = $('ap').value; st.au = u; el.disabled = true; try { await (a === 'login' ? Net.login(u, pw) : Net.signup(u, pw)); } catch (e) { st.err = Net.errText(e); render(); } return; }
+      if (a === 'logout') { await Net.logout(); return; }
+      if (a === 'search') { snap(); st.results = null; st.results = await Net.search(st.q); return render(); }
+      if (a === 'add') { await Net.sendRequest({ uid: d.uid, name: d.name }); st.sent[d.uid] = 1; return render(); }
+      if (a === 'accept') return Net.acceptRequest({ uid: d.uid });
+      if (a === 'decline') return Net.declineRequest({ uid: d.uid });
+      if (a === 'unfriend') { if (confirm('حذف ' + d.name + ' از دوستان؟')) await Net.removeFriend({ uid: d.uid }); return; }
+      if (a === 'nojoin') return Net.dropInvite(d.from);
+      if (a === 'invite') return invite(d.uid, d.name);
+      if (a === 'join') return joinInvite(d.rid, d.from);
+    } catch (e) { st.msg = Net.errText(e); render(); }
+  }
+
+  async function invite(uid, name) {
+    snap(); const me = Net.me; $('waitT').textContent = `در انتظار ${name}…`; show('sWait');
+    try {
+      const { rid, seed } = await Net.createRoom({ uid, name }, sel.inv), meta = { host: me.uid, guest: uid, hn: me.name, gn: name, env: sel.inv, seed };
+      const h = { onJoin: u => { if (u === uid) { room = null; Game.startOnline(meta, 0, rr, h); } } }; const rr = room = Net.openRoom(rid, h); rr.join();
+      $('bCancelWait').onclick = async () => { if (room) { await room.leave(true); room = null; } Net.cancelInvite(uid).catch(() => {}); show('sOnline'); };
+    } catch (e) { show('sOnline'); st.msg = Net.errText(e); render(); }
+  }
+  async function joinInvite(rid, from) {
+    const meta = await Net.getRoom(rid);
+    if (!meta) { await Net.dropInvite(from); st.msg = 'این دعوت منقضی شده.'; return render(); }
+    const h = {}, rr = Net.openRoom(rid, h); rr.join(); await Net.dropInvite(from); Game.startOnline(meta, 1, rr, h);
+  }
+
+  function init() {
+    buildBot();
+    document.addEventListener('click', e => {
+      const g = e.target.closest('[data-go]'); if (g) { show(g.dataset.go); return; }
+      const lvc = e.target.closest('[data-lv]'); if (lvc) { sel.level = +lvc.dataset.lv; lset('pk_lv', sel.level); buildBot(); return; }
+      const ec = e.target.closest('[data-env]'); if (ec) { sel.env = ec.dataset.env; lset('pk_env', sel.env); buildBot(); return; }
+      const a = e.target.closest('[data-act]'); if (a && $('onlinePanel').contains(a)) act(a);
+    });
+    $('onlinePanel').addEventListener('keydown', e => { if (e.key === 'Enter') { const b = $('onlinePanel').querySelector(st.view === 'auth' ? '[data-act=login]' : '[data-act=search]'); b && b.click(); } });
+    $('bBot').onclick = () => show('sBot'); $('bOnline').onclick = () => show('sOnline'); $('bHelp').onclick = () => show('sHelp');
+    $('bStartBot').onclick = () => { Snd.unlock(); Game.start({ mode: 'bot', env: sel.env, level: sel.level, me: 0, names: ['تو', '🤖 ' + Core.LEVELS[sel.level].name], seed: (Math.random() * 1e9) | 0 }); };
+    $('bSound').onclick = () => { Snd.on = !Snd.on; lset('pk_snd', Snd.on ? 1 : 0); $('bSound').textContent = '🔊 صدا: ' + (Snd.on ? 'روشن' : 'خاموش'); };
+    Snd.on = ls('pk_snd', 1) != 0; $('bSound').textContent = '🔊 صدا: ' + (Snd.on ? 'روشن' : 'خاموش');
+    if (Net.configured()) initNet().catch(() => {}); // ورود خودکار و دریافت دعوت‌ها
+  }
+  return { show, init };
+})();
+
+Render.init($('cv')); Game.bindInput(); UI.init();
+</script></body></html>
